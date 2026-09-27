@@ -1,0 +1,26 @@
+services:
+  helper:
+    image: node@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32
+    command: ["node", "/app/server.mjs"]
+    user: "65532:65532"
+    network_mode: host
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    cpus: 0.25
+    pids_limit: 32
+    env_file: .env
+    environment:
+      CAPTION_BIND: 127.0.0.1
+      CAPTION_PORT: 8789
+      CAPTION_BROWSER_PORT: 9227
+      PREVIEW_PORT: 8790
+    volumes:
+      - ./server.mjs:/app/server.mjs:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: 2m
+        max-file: "2"

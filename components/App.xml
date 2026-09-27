@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="App" extends="Scene">
+  <script type="text/brightscript" uri="pkg:/components/Model.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Api.brs" />
+  <script type="text/brightscript" uri="pkg:/components/App.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Browse.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Search.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Playback.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Reliability.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Captions.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Display.brs" />
+  <script type="text/brightscript" uri="pkg:/components/SubtitlePlayback.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Sync.brs" />
+<script type="text/brightscript" uri="pkg:/components/Diagnostics.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Experience.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Intro.brs" />
+  <script type="text/brightscript" uri="pkg:/components/CloudWatchlist.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Previews.brs" />
+<children>
+    <Group id="shell">
+      <Rectangle width="1280" height="720" color="0x0b0d12ff" />
+      <Rectangle width="232" height="720" color="0x11151cff" />
+      <Label text="30nama" translation="[40,44]" font="font:LargeBoldSystemFont" color="0xf4f6faff" />
+      <Rectangle translation="[40,101]" width="32" height="3" color="0xe5b46aff" />
+      <LabelList vertFocusAnimationStyle="floatingFocus" id="nav" translation="[30,174]" itemSize="[182,54]" itemSpacing="[0,10]" numRows="5" color="0xa9b3c3ff" focusedColor="0x0b0d12ff" />
+      <Label id="heading" translation="[280,44]" width="920" height="46" font="font:LargeBoldSystemFont" color="0xf4f6faff" />
+      <Label id="status" translation="[280,96]" width="920" height="44" font="font:SmallSystemFont" color="0xa9b3c3ff" />
+      <Label id="searchQueryLabel" translation="[280,96]" width="650" height="44" font="font:SmallSystemFont" color="0xa9b3c3ff" visible="false" />
+      <Group id="browse">
+        <Label id="previewTitle" translation="[280,156]" width="920" height="42" font="font:MediumBoldSystemFont" color="0xf4f6faff" />
+        <Label id="previewMeta" translation="[280,208]" width="920" height="30" font="font:SmallSystemFont" color="0xe5b46aff" />
+        <BrowseRails id="rails" translation="[280,252]" itemComponentName="PosterCard" itemSize="[930,326]" rowItemSize="[[180,296]]" rowItemSpacing="[[22,0]]" numRows="2" showRowLabel="[true]" rowLabelOffset="[[0,0]]" rowLabelColor="0xb7c0ceff" rowFocusAnimationStyle="floatingFocus" drawFocusFeedback="false" />
+      </Group>
+      <Group id="detail" visible="false">
+        <Rectangle translation="[280,166]" width="228" height="338" color="0x202631ff" />
+        <Poster id="detailPoster" translation="[280,166]" width="228" height="338" loadDisplayMode="scaleToFit" />
+        <Label id="detailTitle" translation="[550,164]" width="650" height="92" wrap="true" font="font:LargeBoldSystemFont" color="0xf4f6faff" />
+        <Label id="detailMeta" translation="[550,266]" width="650" height="36" font="font:SmallBoldSystemFont" color="0xe5b46aff" />
+        <Label id="detailPlot" translation="[550,310]" width="650" height="118" wrap="true" font="font:SmallSystemFont" color="0xa9b3c3ff" />
+        <LabelList vertFocusAnimationStyle="floatingFocus" id="actions" translation="[550,438]" itemSize="[590,36]" itemSpacing="[0,3]" numRows="5" focusedColor="0x0b0d12ff" />
+      </Group>
+      <LabelList vertFocusAnimationStyle="floatingFocus" id="list" translation="[280,176]" itemSize="[910,56]" itemSpacing="[0,8]" numRows="7" focusedColor="0x0b0d12ff" visible="false" />
+      <Label id="empty" translation="[280,260]" width="900" height="160" wrap="true" font="font:MediumSystemFont" color="0xa9b3c3ff" visible="false" />
+      <Rectangle translation="[232,642]" width="1048" height="78" color="0x0b0d12ff" />
+      <Label id="hint" translation="[280,660]" width="920" height="28" font="font:SmallSystemFont" color="0x8994a5ff" />
+    </Group>
+    <Group id="playerScreen" visible="false">
+      <Rectangle width="1280" height="720" color="0x000000ff" />
+      <Video id="player" width="1280" height="720" />
+      <Group id="captionLayer" translation="[80,520]" visible="false">
+        <Rectangle id="captionBackground" width="1120" height="64" color="0x000000b0" />
+        <Label id="captionText" translation="[16,4]" width="1088" height="132" wrap="true" horizAlign="center" vertAlign="center" color="0xffffffff">
+          <Font role="font" uri="pkg:/components/fonts/Caption-Regular.ttf" size="32" />
+        </Label>
+      </Group>
+      <Label id="captionNotice" translation="[64,90]" width="1152" height="34" font="font:SmallSystemFont" color="0xffffffff" />
+      <Label id="playbackStatus" translation="[64,40]" width="800" height="42" font="font:MediumBoldSystemFont" color="0xffffffff" />
+      <Label id="seekNotice" translation="[64,142]" width="1152" height="40" font="font:MediumBoldSystemFont" color="0xffffffff" />
+      <Group id="introPrompt" translation="[904,40]" visible="false">
+        <Rectangle width="312" height="50" color="0x151b25f5" />
+        <Label text="Skip intro · OK" translation="[12,8]" width="288" height="34" horizAlign="center" font="font:SmallBoldSystemFont" color="0xe5b46aff" />
+      </Group>
+      <Group id="controls" visible="false">
+        <Rectangle translation="[0,432]" width="1280" height="288" color="0x080b11ee" />
+        <Label id="playerTitle" translation="[64,464]" width="1152" height="42" font="font:MediumBoldSystemFont" color="0xffffffff" />
+        <Label id="playerMeta" translation="[64,516]" width="850" height="30" font="font:SmallSystemFont" color="0xb7c0ceff" />
+        <Label id="playerTime" translation="[906,516]" width="310" height="30" horizAlign="right" font="font:SmallSystemFont" color="0xb7c0ceff" />
+        <Rectangle translation="[64,564]" width="1152" height="5" color="0x39414eff" />
+        <Rectangle id="timeline" translation="[64,564]" width="0" height="5" color="0xe5b46aff" />
+        <Group id="controlButtons" translation="[64,604]" />
+        <Label text="Back hides controls · Down subtitles · Up controls · Scenes browses frames" translation="[64,674]" width="1152" font="font:SmallSystemFont" color="0x8994a5ff" />
+      </Group>
+      <Group id="trackPicker" visible="false">
+        <Rectangle width="1280" height="720" color="0x000000bb" />
+        <Rectangle translation="[320,98]" width="640" height="520" color="0x151b25ff" />
+        <Label id="trackHeading" translation="[360,132]" width="560" height="42" font="font:MediumBoldSystemFont" color="0xffffffff" />
+        <LabelList vertFocusAnimationStyle="floatingFocus" id="trackList" translation="[352,198]" itemSize="[576,50]" itemSpacing="[0,8]" numRows="6" focusedColor="0x0b0d12ff" />
+        <Label text="OK selects • Back returns to playback" translation="[360,576]" width="560" font="font:SmallSystemFont" color="0x8994a5ff" />
+      </Group>
+      <Group id="scenePreview" visible="false">
+        <Rectangle width="1280" height="720" color="0x080b11f5" />
+        <Label text="Find scene" translation="[280,80]" width="720" height="48" horizAlign="center" font="font:LargeBoldSystemFont" />
+        <Rectangle translation="[400,158]" width="480" height="270" color="0x202631ff" />
+        <Poster id="previewImage" translation="[400,158]" width="480" height="270" loadDisplayMode="scaleToFit" visible="false" />
+        <Label id="previewTime" translation="[280,456]" width="720" height="42" horizAlign="center" font="font:MediumBoldSystemFont" color="0xe5b46aff" />
+        <Label id="previewStatus" translation="[180,514]" width="920" height="40" horizAlign="center" font="font:SmallSystemFont" />
+        <Label text="Left / Right adjusts · FF / Rewind jumps
+OK seeks · Back cancels" translation="[200,582]" width="880" height="90" wrap="true" horizAlign="center" font="font:SmallSystemFont" />
+      </Group>
+    </Group>
+    <Group id="nextCountdown" visible="false">
+      <Rectangle translation="[704,470]" width="512" height="174" color="0x151b25f5" />
+      <Label id="nextCountdownText" translation="[736,492]" width="448" height="82" wrap="true" font="font:MediumBoldSystemFont" color="0xffffffff" />
+      <Label text="OK plays now · Back cancels" translation="[736,592]" width="448" height="34" font="font:SmallSystemFont" color="0xe5b46aff" />
+    </Group>
+    <Group id="watchPrompt" visible="false">
+      <Rectangle width="1280" height="720" color="0x000000cc" />
+      <Label text="Still watching?" translation="[280,230]" width="720" height="70" horizAlign="center" font="font:LargeBoldSystemFont" />
+      <Label text="Playback is paused and your place is saved.
+OK / Play continues · Back stops" translation="[280,320]" width="720" height="130" wrap="true" horizAlign="center" font="font:MediumSystemFont" />
+    </Group>
+    <Timer id="previewTimer" duration="0.35" repeat="false" />
+    <Timer id="cloudVerifyTimer" duration="1.5" repeat="false" />
+    <Timer id="sleepTimer" duration="1" repeat="true" />
+    <Timer id="syncRetryTimer" duration="20" repeat="false" />
+    <Timer id="healthTimer" duration="2" repeat="true" />
+    <Timer id="seekCommitTimer" duration="0.3" repeat="false" />
+    <Timer id="nextTimer" duration="1" repeat="true" />
+    <Timer id="bufferTimer" duration="15" repeat="false" />
+    <Timer id="seekPauseTimer" duration="0.2" repeat="false" />
+    <Timer id="saveTimer" duration="10" repeat="true" />
+    <Timer id="overlayTimer" duration="6" repeat="false" />
+  </children>
+</component>

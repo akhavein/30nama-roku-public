@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ApiTask" extends="Task">
+  <interface>
+    <field id="helperUrl" type="string" />
+    <field id="helperToken" type="string" />
+    <field id="base" type="string" />
+    <field id="apiKey" type="string" />
+    <field id="token" type="string" />
+    <field id="version" type="string" />
+    <field id="platform" type="string" />
+    <field id="action" type="string" />
+    <field id="requestId" type="string" />
+    <field id="tag" type="string" />
+    <field id="sessionEpoch" type="integer" />
+    <field id="generation" type="integer" />
+    <field id="payload" type="assocarray" />
+    <field id="language" type="string" />
+    <field id="email" type="string" />
+    <field id="code" type="string" />
+    <field id="result" type="assocarray" />
+    <field id="httpStatus" type="integer" />
+    <field id="elapsedMs" type="integer" />
+  </interface>
+  <script type="text/brightscript" uri="pkg:/components/ApiTask.brs" />
+</component>

@@ -1,0 +1,19 @@
+{
+  "name": "30nama-roku",
+  "version": "1.7.0",
+  "private": true,
+  "scripts": {
+    "check": "bsc --project bsconfig.json",
+    "test": "python3 scripts/test.py && node --test helper/server.test.mjs && python3 tests/soak-recorder.py && python3 -m unittest discover -s preview -p test_server.py",
+    "package": "sh scripts/validate.sh && sh scripts/package.sh"
+  },
+  "devDependencies": {
+    "brighterscript": "0.70.4",
+    "brs": "0.45.0"
+  },
+  "overrides": {
+    "decompress": "4.2.1",
+    "decode-uri-component": "0.2.2",
+    "uuid": "11.1.0"
+  }
+}

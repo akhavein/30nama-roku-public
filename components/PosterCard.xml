@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="PosterCard" extends="Group">
+  <interface>
+    <field id="itemContent" type="node" onChange="onContent" />
+    <field id="focusPercent" type="float" onChange="onFocus" />
+    <field id="rowFocusPercent" type="float" onChange="onFocus" />
+  </interface>
+  <script type="text/brightscript" uri="pkg:/components/PosterCard.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Display.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Captions.brs" />
+  <children>
+    <Rectangle id="focusFrame" translation="[0,0]" width="180" height="252" color="0xe5b46aff" opacity="0" />
+    <Rectangle translation="[4,4]" width="172" height="244" color="0x202631ff" />
+    <Label id="placeholder" translation="[12,80]" width="156" height="90" wrap="true" horizAlign="center" font="font:SmallSystemFont" color="0x7f8a9cff" />
+    <Poster id="art" translation="[4,4]" width="172" height="244" loadDisplayMode="scaleToFit" />
+    <Rectangle id="progressBg" translation="[0,247]" width="180" height="5" color="0x333b48ff" visible="false" />
+    <Rectangle id="progress" translation="[0,247]" width="0" height="5" color="0xe5b46aff" />
+    <Label id="title" translation="[0,256]" width="180" height="40" font="font:SmallSystemFont" color="0xe9edf4ff" />
+  </children>
+</component>

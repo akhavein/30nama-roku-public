@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SubtitleTask" extends="Task">
+  <interface>
+    <field id="helperUrl" type="string" />
+    <field id="helperToken" type="string" />
+    <field id="url" type="string" />
+    <field id="requestId" type="string" />
+    <field id="generation" type="integer" />
+    <field id="result" type="assocarray" alwaysNotify="true" />
+  </interface>
+  <script type="text/brightscript" uri="pkg:/components/Captions.brs" />
+  <script type="text/brightscript" uri="pkg:/components/SubtitleTask.brs" />
+</component>

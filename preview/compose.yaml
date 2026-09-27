@@ -1,0 +1,29 @@
+services:
+  preview:
+    image: roku-preview:1.7.0
+    network_mode: host
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 192m
+    cpus: 0.35
+    pids_limit: 24
+    env_file: .env
+    environment:
+      PREVIEW_HOSTS: us-stream-node.divyacamilla.info
+      PREVIEW_PORT: 8790
+      PREVIEW_BIND: 127.0.0.1
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.create_connection(('127.0.0.1',8790),2); s.close()"]
+      interval: 15s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+    tmpfs:
+      - /tmp:size=8m,mode=1777
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: "2"

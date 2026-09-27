@@ -1,0 +1,20 @@
+[Unit]
+Description=Private Roku subtitle and progress browser
+After=network-online.target
+Wants=network-online.target
+[Service]
+DynamicUser=yes
+StateDirectory=roku-browser
+ExecStart=/usr/bin/xvfb-run -a /usr/bin/chromium --no-sandbox --disable-gpu --disable-software-rasterizer --disable-dev-shm-usage --user-data-dir=/var/lib/roku-browser/profile --remote-debugging-address=127.0.0.1 --remote-debugging-port=9227 --no-first-run --no-default-browser-check --disable-background-networking https://interface.30nama.com/
+Restart=on-failure
+RestartSec=5
+MemoryMax=640M
+CPUQuota=50%
+TasksMax=256
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+RestrictSUIDSGID=yes
+[Install]
+WantedBy=multi-user.target

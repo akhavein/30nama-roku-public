@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+import importlib.util,pathlib,time
+spec=importlib.util.spec_from_file_location('acceptance',pathlib.Path(__file__).with_name('qa-acceptance.py'));q=importlib.util.module_from_spec(spec);spec.loader.exec_module(q)
+q.launch('stream:105');q.expect('missing Persian sidecar does not stop video',lambda s:s.get('player')=='playing' and "couldn't" in s.get('captionnotice',''),12)
+q.mark();q.keys('Select','Right','Right','Right','Select','Down','Select');q.expect('Off recovers from subtitle fetch failure',lambda s:not s.get('customcaption') and s.get('captionnotice')=='')
+q.launch('stream:107');q.expect('slow subtitle fetch leaves video responsive',lambda s:s.get('player')=='playing' and s.get('customcaption'),8)
+q.mark();q.keys('Select','Right','Right','Right','Select','Down','Select');time.sleep(11)
+q.expect('late subtitle result cannot reenable Off',lambda s:not s.get('customcaption') and s.get('captiontext')=='' and s.get('captionnotice')=='',5)
+q.launch('stream:106');q.expect('expired subtitle refreshes metadata without restarting playback',lambda s:s.get('player')=='playing' and s.get('captiontext') and s.get('customcaption'),15)
+q.launch('stream:108');q.expect('repeated expired subtitle stops after one retry',lambda s:s.get('player')=='playing' and "couldn't" in s.get('captionnotice',''),15)
+q.mark();q.keys('Select','Right','Right','Right','Select','Down','Select');q.expect('Off recovers after expired subtitle retry',lambda s:not s.get('customcaption') and s.get('captionnotice')=='')
+q.launch('stream:117');q.expect('temporary subtitle 503 retries automatically',lambda s:s.get('player')=='playing' and s.get('captiontext') and s.get('customcaption'),15)
+q.mark();q.keys('Down');q.expect('subtitle picker works after transient recovery',lambda s:s.get('tracks') and s.get('trackkind')=='subtitles')
+(q.ROOT/'build/qa-caption-faults-results.json').write_text((q.ROOT/'build/qa-results.json').read_text())
+print('CAPTION FAILURE RECOVERY PASS',flush=True)

@@ -1,0 +1,15 @@
+node_modules
+build/
+*.log
+__pycache__/
+*.pyc
+
+.runtime/
+
+.env
+*.env
+
+secrets/
+*.pem
+*.key
+.DS_Store
