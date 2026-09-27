@@ -46,14 +46,14 @@ class Browser {
     return new Promise((resolve,reject)=>{const id=++this.id;const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error('browser-timeout'))},timeout);this.pending.set(id,{resolve,reject,timer});this.ws.send(JSON.stringify({id,method,params}))});
   }
   async progress(value) {
-    const options={method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','c-api-key':(value.apiKey||value.apikey),'c-token':value.token,'c-platform':'Website','c-app-version':'2.0.0','c-useragent':'30nama Roku TV','c-output-requests':'true'},body:new URLSearchParams(value.progress).toString(),redirect:'error'};
+    const options={method:'POST',credentials:'omit',headers:{'Content-Type':'application/x-www-form-urlencoded','c-api-key':(value.apiKey||value.apikey),'c-token':value.token,'c-platform':'Website','c-app-version':'2.0.0','c-useragent':'30nama Roku TV','c-output-requests':'true'},body:new URLSearchParams(value.progress).toString(),redirect:'error'};
     const result=await this.call('Runtime.evaluate',{expression:`fetch('https://interface.30nama.com/observer/observer',{...${JSON.stringify(options)},signal:AbortSignal.timeout(18000)}).then(r=>({status:r.status}))`,awaitPromise:true,returnByValue:true});
     if(result.exceptionDetails || !result.result?.value)throw new Error('progress-fetch');
     return result.result.value;
   }
   async subtitle(url) {
     const result=await this.call('Runtime.evaluate',{
-      expression:`fetch(${JSON.stringify(url)},{cache:'no-store',redirect:'error',signal:AbortSignal.timeout(18000)}).then(async r=>{const body=await r.text();return {status:r.status,body:body.length<=4000000?body:''}})`,
+      expression:`fetch(${JSON.stringify(url)},{credentials:'omit',cache:'no-store',redirect:'error',signal:AbortSignal.timeout(18000)}).then(async r=>{const body=await r.text();return {status:r.status,body:body.length<=4000000?body:''}})`,
       awaitPromise:true,returnByValue:true
     });
     if (result.exceptionDetails || !result.result?.value) throw new Error('subtitle-fetch');

@@ -2,7 +2,11 @@
 
 Unofficial, native SceneGraph/BrightScript TV client for 30nama. Designed for remote-first navigation, English/Persian search, reliable resume and readable Persian captions.
 
-**Public source snapshot · v1.7 candidate.** This is not an official Roku Store app or an affiliation with 30nama. It includes scene-preview work, but final candidate reinstall/resume acceptance is still pending. Publishing this source is not a v1.7 production release.
+**Store-readiness development candidate · not submitted.** This is not an official Roku Store app or an affiliation with 30nama. It includes scene-preview work, but final candidate reinstall/resume acceptance is still pending. Publishing this source is not a v1.7 production release.
+
+## Store-readiness branch
+
+This branch adds cold/warm deep links, Roku authentication reporting and launch beacons, short-lived account-bound helper sessions, account-switch/local-data clearing, original unofficial artwork, and initial system-caption/transport changes. It is **not native-verified or certified**. See [implementation status](docs/store/STATUS.md), [gateway setup](service/README.md), and [native acceptance matrix](docs/store/DEVICE_ACCEPTANCE.md).
 
 ## Features
 
@@ -60,8 +64,8 @@ Installing replaces the currently sideloaded channel. Device scripts send real r
 | Browse | Arrows navigate; OK opens; Play starts/resumes; Back restores the previous screen |
 | Search / Watchlist | Star opens options; search FF/Rewind changes pages |
 | Playback | Play pauses/resumes; Up opens controls; Down opens subtitles |
-| Quick seek | Left/Right, FF/Rewind and Replay use saved intervals |
-| Scenes | Up → Scenes → OK; arrows change target; OK/Play commits; Back cancels |
+| Quick seek | Left/Right uses the saved step; Replay uses the saved 10–25 second interval |
+| Scenes | FF/Rewind, or Up → Scenes → OK; arrows change target; OK/Play commits; Back cancels |
 | Back in player | Dismiss a picker, hide controls, then close playback |
 
 Account → Playback preferences contains intervals, sleep and still-watching settings. No helper endpoint is preconfigured. Pair a helper you control for provider-side external captions, bridged progress and optional thumbnails; see [helper setup](helper/README.md).

@@ -98,6 +98,7 @@ sub OnPreference(index as Integer)
     end if
     choices = ["5","10","15","30"]
     if action = "skip" then choices = ["10","30","60"]
+    if action = "replay" then choices = ["10","15","20","25"]
     m["remote_" + action] = SafeInt(ChoiceNext(Text(RemoteSeconds(action)),choices))
     m.registry.Write("remote_" + action,Text(m["remote_" + action]))
     m.registry.Flush()
@@ -128,6 +129,7 @@ function StillLabel() as String
 end function
 
 sub OnSleepTick()
+    if m.page = "player" and m.customCaptionEnabled = true then UpdateCustomCaption()
     delta = m.sleepTickClock.TotalMilliseconds() / 1000.0
     m.sleepTickClock.Mark()
     if m.page = "player" and m.player.state = "playing" and not m.watchPrompt.visible then m.watchSeconds = m.watchSeconds + delta

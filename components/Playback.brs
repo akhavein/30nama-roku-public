@@ -39,7 +39,10 @@ sub StartPlayback(file as Dynamic, subtitles as Dynamic, sourceIndex = 0 as Inte
     m.playCompleted = false
     m.pendingSubtitle = true
     m.playerError = false
-    m.originalCaptionMode = m.player.globalCaptionMode
+    m.captionAuthRetries = 0
+    m.reauthCaption = false
+    m.captionReplayUntil = 0
+    m.originalCaptionMode = CreateObject("roDeviceInfo").GetCaptionsMode()
     m.defaultSubtitleTrack = ""
     content = CreateObject("roSGNode", "ContentNode")
     content.title = m.title.title
@@ -81,6 +84,7 @@ sub OnPlayerState()
     if state = "playing" then
         m.bufferTimer.control = "stop"
         m.playStarted = true
+        QueueStoreRendered()
         m.advanceClock.Mark()
         if not m.startupMeasured then
             m.startupMeasured = true
@@ -218,7 +222,6 @@ sub ClosePlayback(save as Boolean)
     m.trackPicker.visible = false
     m.controls.visible = false
     m.player.control = "stop"
-    m.player.globalCaptionMode = m.originalCaptionMode
     m.playerScreen.visible = false
     m.shell.visible = true
     m.status.text = ""
@@ -413,19 +416,17 @@ end sub
 
 sub ApplySavedSubtitle()
     pref = m.registry.Read("subtitle_preference")
-    if pref = "" then pref = "system"
+    if pref = "" or pref = "off" then pref = "system"
     if pref = "system" then
-        if m.originalCaptionMode = "On" and SidecarUrl("en") <> "" then LoadSidecarCaptions("en")
+        if SidecarUrl("en") <> "" then LoadSidecarCaptions("en")
         m.pendingSubtitle = false
         return
     end if
-    if pref = "off" then m.player.globalCaptionMode = "Off": m.pendingSubtitle = false: return
     if SidecarUrl(pref) <> "" then LoadSidecarCaptions(pref): m.pendingSubtitle = false: return
     options = NativeSubtitleOptions(m.subtitleOptions,m.player.availableSubtitleTracks)
     for each option in options
         if option.code = pref and option.track <> "" then
             m.player.subtitleTrack = option.track
-            m.player.globalCaptionMode = "On"
             m.pendingSubtitle = false
             return
         end if
@@ -549,19 +550,22 @@ sub OnTrackSelected()
         if option.code = "timing" then ShowTracks("timing"): return
         ClearCustomCaptions()
         if (option.code = "fa" or option.code = "en") and SidecarUrl(option.code) <> "" then
+            CreateObject("roDeviceInfo").SetCaptionsMode("On")
             LoadSidecarCaptions(option.code)
         else if option.code = "off" then
             m.player.globalCaptionMode = "Off"
         else if option.code = "system" then
-            m.player.globalCaptionMode = m.originalCaptionMode
+            ' System mode is owned by Roku settings; never restore a stale snapshot.
             if m.defaultSubtitleTrack <> "" then m.player.subtitleTrack = m.defaultSubtitleTrack
-            if m.originalCaptionMode = "On" and SidecarUrl("en") <> "" then LoadSidecarCaptions("en")
+            if SidecarUrl("en") <> "" then LoadSidecarCaptions("en")
         else
             m.player.subtitleTrack = option.track
             m.player.globalCaptionMode = "On"
         end if
         if option.code <> "embedded" then
-            m.registry.Write("subtitle_preference",option.code)
+            preference = option.code
+            if preference = "off" then preference = "system"
+            m.registry.Write("subtitle_preference",preference)
             m.registry.Flush()
         end if
     else if option.track <> "" then
@@ -636,12 +640,20 @@ function PlayerKey(key as String) as Boolean
         return true
     end if
     if key = "fastforward" or key = "rewind" then
+        if m.playStarted = true and m.seekPending <> true and m.seekSettling <> true then
+            OpenScenePreview()
+            if m.scenePreview.visible then return ScenePreviewKey(key)
+        end if
         delta = RemoteSeconds("skip")
         if key = "rewind" then delta = -delta
         SeekBy(delta)
         return true
     end if
-    if key = "replay" then SeekBy(-RemoteSeconds("replay")): return true
+    if key = "replay" then
+        m.captionReplayUntil = m.player.position
+        SeekBy(-RemoteSeconds("replay"))
+        return true
+    end if
     if key = "up" then ShowControls(): return true
     return false
 end function

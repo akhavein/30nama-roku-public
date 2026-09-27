@@ -2,6 +2,8 @@
 
 Optional Node.js 22+ service for exact-host `subtitle.30nama.com` timed text and provider progress updates. It uses a dedicated Chrome/Chromium instance through loopback CDP. A paired Roku sends account credentials transiently for progress; run only a helper you control, over authenticated HTTPS. Credentials and signed URLs must never be logged.
 
+For the public-user candidate, place the [account-bound session gateway](../service/README.md) in front of a **separate** helper/browser deployment. The household pairing recipe below is not consumer onboarding.
+
 ## Local development
 
 `node --test helper/server.test.mjs` runs synthetic tests. `helper/deploy.py` is an optional macOS LaunchAgent installer for Chrome and Node; it modifies local services only when explicitly run. Defaults bind to loopback and allow loopback clients only. It does not configure a reachable Roku endpoint automatically.

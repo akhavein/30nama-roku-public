@@ -11,12 +11,12 @@ def build():
     dest=ROOT/'build/qa-app'
     if dest.exists():shutil.rmtree(dest)
     dest.mkdir(parents=True,exist_ok=True)
-    for name in ['components','source']:shutil.copytree(ROOT/name,dest/name,dirs_exist_ok=True)
+    for name in ['components','source','images']:shutil.copytree(ROOT/name,dest/name,dirs_exist_ok=True)
     shutil.copy(ROOT/'manifest',dest/'manifest')
     p=dest/'components/Api.brs';s=p.read_text();import re
     s=re.sub(r'base: "[^"]+"',f'base: "http://{HOST}:{PORT}/api"',s);s=re.sub(r'apiKey: "[^"]+"','apiKey: "fixture"',s);p.write_text(s)
     p=dest/'components/App.brs';s=p.read_text().replace('"30nama")','"30nama-test")',1);s=s.replace('    m.api.token = m.registry.Read("session_token")','    m.api.token = "fixture"\n    m.top.observeField("qaScenario","OnQaScenario")');p.write_text(s)
-    p=dest/'components/App.xml';s=p.read_text().replace('<children>','<interface><field id="qaRun" type="string" /><field id="qaScenario" type="string" alwaysNotify="true" /></interface>\n<script type="text/brightscript" uri="pkg:/components/Qa.brs" />\n<children>',1);p.write_text(s)
+    p=dest/'components/App.xml';s=p.read_text().replace('</interface>','<field id="qaRun" type="string" /><field id="qaScenario" type="string" alwaysNotify="true" /></interface>\n<script type="text/brightscript" uri="pkg:/components/Qa.brs" />',1);p.write_text(s)
     p=dest/'components/Previews.brs';s=p.read_text().replace('Left(m.helperUrl,8) <> "https://"','Left(m.helperUrl,7) <> "http://"');p.write_text(s)
     (dest/'components/Qa.brs').write_text((ROOT/'tests/device/Qa.brs').read_text().replace('QA_HOST_PLACEHOLDER',HOST))
     p=dest/'source/main.brs';s=p.read_text().replace('sub Main()','sub Main(args as Dynamic)').replace('    screen.Show()','    screen.Show()\n    if args <> invalid and args.scenario <> invalid then scene.qaRun = args.qaRun: scene.qaScenario = args.scenario');p.write_text(s)

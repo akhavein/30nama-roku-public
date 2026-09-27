@@ -22,10 +22,14 @@ Do not install, launch, send remote keys or run native QA against a real TV unle
 - Search transport shortcuts belong in `BrowseRails`; native RowList consumes these before the parent Scene.
 - Account Watchlist writes require readback; do not blindly retry toggle mutations.
 - Keep captions independent of thumbnail failures. Bound every request, retry, cache, queue and media fetch.
-- Shipping packages contain only manifest/source/components, never QA hooks or temporary pairing code.
+- Shipping packages contain only manifest/source/components/images, never QA hooks or temporary pairing code.
 - Never reintroduce `suppressCaptions` based on simulated tests. Verify native caption lifecycle and app exit.
 - Installer screenshots omit native video planes: do not claim picture/audio/lip-sync verification from them.
 
 ## Release claims
 
 This snapshot is a v1.7 candidate; final reinstall/resume acceptance is pending. Preserve that distinction until measured gates pass. A public code push is not a production release or Store certification. Keep reports factual and exclude personal viewing history.
+
+## Store candidate work
+
+`feature/store-readiness` is not installed or certified. Include `service/server.test.mjs` in checks. Deep-link IDs and actual device acceptance are specified in `docs/store/DEVICE_ACCEPTANCE.md`. Never replace pending native gates with simulator claims, ship a shared household helper credential, or silently broaden preview source/network limits. Public gateway and policy drafts require deployment facts and publisher inputs.

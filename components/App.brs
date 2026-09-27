@@ -120,6 +120,8 @@ sub init()
     m.saveTimer.observeField("fire", "OnSaveTimer")
     m.overlayTimer.observeField("fire", "OnOverlayTimer")
     m.stats = {requests:0, failures:0}
+    InitManagedService()
+    InitStoreIntegration()
     ShowHome()
     Request("catalog", "mainV2", {})
     LoadRemoteHistory()
@@ -247,16 +249,30 @@ sub OnApiResult(event as Object)
         m.registry.Delete("session_token")
         m.registry.Flush()
     end if
-    if Left(tag,6) = "cloud-" then
+    if (tag = "progress" or tag = "helper-health") and task.httpStatus = 401 then RefreshManagedSession()
+    if task.httpStatus = 401 and IsMap(m.pendingStoreLink) and tag <> "progress" and tag <> "helper-health" and tag <> "login" then
+        OnStoreLink()
+        return
+    end if
+    if Left(tag,6) = "store-" then
+        HandleStoreResult(tag,result)
+    else if Left(tag,6) = "cloud-" then
         HandleCloudResult(tag,result,task.httpStatus)
     else if tag = "helper-health" then
         m.helperStatus = "Unavailable"
         if ok then m.helperStatus = "Ready"
         if task.httpStatus = 401 then m.helperStatus = "Pairing key needs repair"
     else if tag = "profile" then
-        if ok and IsMap(result.result) then
+        if ok and IsMap(result.result) and SafeInt(result.result.userid) > 0 then
+            owner = Text(result.result.userid)
+            previousOwner = m.registry.Read("account_owner")
+            if previousOwner <> "" and previousOwner <> owner then ClearLocalViewingData()
+            m.registry.Write("account_owner",owner)
+            m.registry.Flush()
             m.userId = SafeInt(result.result.userid)
             m.syncToken = Text(result.result.usertoken)
+            ReportStoreAuthentication()
+            EnsureManagedSession()
         end if
     else if tag = "remote-history" then
         HandleRemoteHistory(result)
@@ -270,6 +286,7 @@ sub OnApiResult(event as Object)
         else if m.page = "home" then
             m.status.text = "Couldn't load the catalog. Open Account to refresh."
         end if
+        QueueStoreRendered()
     else if tag = "detail" then
         if ok and IsMap(result.result) then
             info = NormalizeTitle(result.result)
@@ -308,6 +325,7 @@ end sub
 
 sub OnNav()
     if m.page = "player" then return
+    m.pendingStoreLink = invalid
     index = m.nav.itemSelected
     if index = 0 then ShowHome()
     if index = 1 then ShowContinue()
@@ -320,11 +338,11 @@ sub ShowAccount()
     EnterPage("account", "Account")
     auth = "Sign in"
     m.status.text = "Sign in to watch with your 30nama account"
-    if m.api.token <> "" then auth = "Sign out": m.status.text = "Signed in on this TV"
-    m.listActions = ["auth", "refresh", "diagnostics", "autoplay", "verifyLogin", "preferences", "cloud-watchlist"]
+    if m.api.token <> "" then auth = "Sign out and clear local viewing data": m.status.text = "Signed in on this TV"
+    m.listActions = ["auth", "refresh", "diagnostics", "autoplay", "verifyLogin", "preferences", "cloud-watchlist", "clear-local"]
     autoLabel = "Autoplay next episode: Off"
     if m.autoplay then autoLabel = "Autoplay next episode: On"
-    m.list.content = MakeLabels([auth, "Refresh catalog", "Connection diagnostics", autoLabel, "Verify sign-in with a fresh code", "Playback preferences", "30nama account Watchlist"])
+    m.list.content = MakeLabels([auth, "Refresh catalog", "Connection diagnostics", autoLabel, "Verify sign-in with a fresh code", "Playback preferences", "30nama account Watchlist", "Clear viewing data on this TV"])
     m.list.visible = true
     m.list.setFocus(true)
 end sub
@@ -332,6 +350,7 @@ end sub
 sub ShowLoginKeyboard(kind as String)
     m.loginKind = kind
     if m.keyboard <> invalid then CloseKeyboard()
+    m.top.SignalBeacon("AppDialogInitiate")
     m.keyboard = CreateObject("roSGNode", "StandardKeyboardDialog")
     m.keyboard.title = "Sign in to 30nama"
     m.keyboard.buttons = ["Continue", "Cancel"]
@@ -349,7 +368,7 @@ end sub
 
 sub OnLoginKeyboard()
     if m.keyboard = invalid then return
-    if m.keyboard.buttonSelected = 1 then CloseKeyboard(): ShowAccount(): return
+    if m.keyboard.buttonSelected = 1 then m.pendingStoreLink = invalid: CloseKeyboard(): ShowAccount(): QueueStoreRendered(): return
     value = m.keyboard.text.Trim()
     if value = "" then KeyboardMessage("Please enter a value before continuing"): return
     if m.tasks.DoesExist("login") then return
@@ -383,6 +402,7 @@ sub HandleLogin(result as Dynamic, action as String)
             ShowAccount()
             m.status.text = "Signed in successfully"
             LoadRemoteHistory()
+            ResumeStoreLink()
             return
         end if
     end if
@@ -407,13 +427,16 @@ sub OnKeyboardClosed(event as Object)
     if m.keyboard = invalid then return
     closed = event.GetRoSGNode()
     if closed.dialogId <> m.keyboard.dialogId then return
+    m.pendingStoreLink = invalid
     CloseKeyboard()
+    QueueStoreRendered()
     if m.page = "search" then CancelSearchEdit() else ShowAccount()
 end sub
 
 sub CloseKeyboard()
     CancelRequest("login")
     if m.keyboard <> invalid then
+        if m.page <> "search" then m.top.SignalBeacon("AppDialogComplete")
         m.keyboard.unobserveField("wasClosed")
         m.keyboard.unobserveField("buttonSelected")
         m.keyboard.close = true
@@ -451,7 +474,9 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
     if m.page = "player" then return PlayerKey(key)
     if m.keyboard <> invalid then
         if key = "back" then
+            m.pendingStoreLink = invalid
             CloseKeyboard()
+            QueueStoreRendered()
             if m.page = "search" then CancelSearchEdit() else ShowAccount()
             return true
         end if
@@ -485,6 +510,7 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
         return true
     end if
     if key = "back" then
+        m.pendingStoreLink = invalid
         if m.page = "title" then
             if m.episode <> invalid then ShowEpisodes(m.episode.season) else ReturnToBrowse()
         else if m.page = "episodes" then
@@ -504,7 +530,7 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
         else if m.page = "search" then
             ShowSearchKeyboard()
         else if m.page = "home" then
-            if not m.nav.hasFocus() then m.nav.setFocus(true) else return false
+            return false
         else
             ShowHome()
         end if

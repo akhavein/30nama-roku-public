@@ -9,14 +9,14 @@ if not re.fullmatch(r'[A-Za-z0-9_-]{32,128}',token):raise SystemExit('Invalid he
 (ROOT/'.runtime').mkdir(exist_ok=True,mode=0o700)
 with tempfile.TemporaryDirectory(prefix='pair-helper-',dir=ROOT/'.runtime') as tmp:
  folder=pathlib.Path(tmp)
- for name in ['components','source']:shutil.copytree(ROOT/name,folder/name)
+ for name in ['components','source','images']:shutil.copytree(ROOT/name,folder/name)
  shutil.copy(ROOT/'manifest',folder/'manifest')
  app=folder/'components/App.brs';s=app.read_text();needle='    m.registry = CreateObject("roRegistrySection", "30nama")'
  assert needle in s
  s=s.replace(needle,needle+'\n    m.registry.Write("helper_url","'+a.url+'")\n    m.registry.Write("helper_token","'+token+'")\n    m.registry.Flush()',1);app.write_text(s)
  archive=folder/'pair.zip'
  with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
-  for name in ['components','source']:
+  for name in ['components','source','images']:
    for f in (folder/name).rglob('*'):
     if f.is_file():z.write(f,f.relative_to(folder))
   z.write(folder/'manifest','manifest')

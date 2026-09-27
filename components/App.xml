@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="App" extends="Scene">
+  <interface><field id="launchArgs" type="assocarray" alwaysNotify="true" /></interface>
   <script type="text/brightscript" uri="pkg:/components/Model.brs" />
   <script type="text/brightscript" uri="pkg:/components/Api.brs" />
   <script type="text/brightscript" uri="pkg:/components/App.brs" />
@@ -16,6 +17,9 @@
   <script type="text/brightscript" uri="pkg:/components/Intro.brs" />
   <script type="text/brightscript" uri="pkg:/components/CloudWatchlist.brs" />
   <script type="text/brightscript" uri="pkg:/components/Previews.brs" />
+  <script type="text/brightscript" uri="pkg:/components/StoreModel.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Store.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Service.brs" />
 <children>
     <Group id="shell">
       <Rectangle width="1280" height="720" color="0x0b0d12ff" />
@@ -99,6 +103,8 @@ OK seeks · Back cancels" translation="[200,582]" width="880" height="90" wrap="
       <Label text="Playback is paused and your place is saved.
 OK / Play continues · Back stops" translation="[280,320]" width="720" height="130" wrap="true" horizAlign="center" font="font:MediumSystemFont" />
     </Group>
+    <Timer id="serviceTimer" duration="60" repeat="true" />
+    <Timer id="storeRenderTimer" duration="0.1" repeat="false" />
     <Timer id="previewTimer" duration="0.35" repeat="false" />
     <Timer id="cloudVerifyTimer" duration="1.5" repeat="false" />
     <Timer id="sleepTimer" duration="1" repeat="true" />

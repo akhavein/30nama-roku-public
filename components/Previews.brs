@@ -77,6 +77,9 @@ sub OnPreviewResult(event as Object)
     m.previewTask.UnobserveField("result")
     m.previewTask = invalid
     m.previewStatus.text = "Preview unavailable · you can still seek to this time"
+    if IsMap(result) then
+        if result.status = 401 then RefreshManagedSession()
+    end if
     if not ValidPreviewResponse(result,m.previewTarget) then return
     bytes = CreateObject("roByteArray")
     bytes.FromBase64String(result.jpeg)

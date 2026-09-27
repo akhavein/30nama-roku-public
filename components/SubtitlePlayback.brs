@@ -20,7 +20,8 @@ sub LoadSidecarCaptions(code as String, refreshed = false as Boolean)
     ClearCustomCaptions()
     m.captionCode = code
     m.captionRefreshed = refreshed
-    m.player.globalCaptionMode = "Off"
+    ' Never change global caption mode just to draw a sidecar.
+    m.player.subtitleTrack = ""
     url = SidecarUrl(code)
     if url = "" then
         m.captionNotice.text = "This language has no compatible subtitle file."
@@ -80,6 +81,13 @@ sub OnCaptionResult(event as Object)
         print "[30nama][captions] ready cues="; m.captionCues.Count()
         m.captionNotice.text = ""
         UpdateCustomCaption()
+    else if IsMap(result) and result.status = 401 and Text(m.managedOrigin) <> "" then
+        m.captionNotice.text = "Reconnecting subtitle service..."
+        if SafeInt(m.captionAuthRetries) < 1 then
+            m.captionAuthRetries = 1
+            m.reauthCaption = true
+            RefreshManagedSession()
+        end if
     else if IsMap(result) and (result.status = 410 or result.status = 403) and not m.captionRefreshed then
         m.captionRefreshed = true
         m.captionNotice.text = "Refreshing subtitles..."
@@ -94,14 +102,26 @@ sub UpdateCustomCaption()
         if m.scenePreview.visible then m.captionLayer.visible = false: return
     end if
     if not m.customCaptionEnabled then return
+    if m.captionDeviceInfo = invalid then m.captionDeviceInfo = CreateObject("roDeviceInfo")
+    mode = m.captionDeviceInfo.GetCaptionsMode()
+    if not StoreCaptionVisible(mode,m.player.position,SafeInt(m.captionReplayUntil)) then
+        m.captionLayer.visible = false
+        return
+    end if
     seconds = m.player.position - SafeInt(m.captionOffset) / 1000.0
     if IsMap(m.captionIndex) then m.captionText.text = IndexedCaptionAt(m.captionIndex,seconds) else m.captionText.text = CaptionAt(m.captionCues,seconds)
-    layout = CaptionLayout(m.captionText.text,SafeInt(m.captionSize,32))
+    size = SafeInt(m.captionSize,32)
+    setting = m.captionDeviceInfo.GetCaptionsOption("Text/Size")
+    if setting = "Small" or setting = "Extra small" then size = 26
+    if setting = "Medium" then size = 32
+    if setting = "Large" or setting = "Extra large" then size = 40
+    layout = CaptionLayout(m.captionText.text,size)
     m.captionText.font.size = layout.size
     m.captionLayer.visible = m.captionText.text <> ""
     height = layout.height
     m.captionBackground.height = height
     m.captionText.height = height - 8
-    m.captionBackground.color = CaptionContrast(Text(m.captionContrast))
+    m.captionText.color = SystemCaptionColor(m.captionDeviceInfo.GetCaptionsOption("Text/Color"),m.captionDeviceInfo.GetCaptionsOption("Text/Opacity"),"0xffffffff")
+    m.captionBackground.color = SystemCaptionColor(m.captionDeviceInfo.GetCaptionsOption("Background/Color"),m.captionDeviceInfo.GetCaptionsOption("Background/Opacity"),CaptionContrast(Text(m.captionContrast)))
     m.captionLayer.translation = [80,CaptionPlacement(height,Text(m.captionPosition),m.controls.visible)]
 end sub

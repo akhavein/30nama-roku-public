@@ -27,5 +27,10 @@ for filename in Path('components').glob('*.xml'):
     doc = ET.parse(filename)
     for script in doc.iter('script'):
         assert Path(script.attrib['uri'].removeprefix('pkg:/')).is_file()
-print('SceneGraph XML and node-reference checks passed')
+manifest = dict(line.split('=',1) for line in Path('manifest').read_text().splitlines() if '=' in line and not line.startswith('#'))
+for name in ['mm_icon_focus_fhd','mm_icon_focus_hd','splash_screen_hd','splash_screen_sd']:
+    path=Path(manifest[name].removeprefix('pkg:/'))
+    assert path.is_file(), 'Manifest artwork missing'
+    assert path.read_bytes()[:8] == b'\x89PNG\r\n\x1a\n', 'Artwork is not PNG'
+print('SceneGraph XML, node references and manifest artwork checks passed')
 PY

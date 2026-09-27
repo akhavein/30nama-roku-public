@@ -14,6 +14,7 @@ sub FetchPreview()
     if req.AsyncPostFromString(FormatJson({url:m.top.url,seconds:m.top.seconds})) then
         event = Wait(11000,port)
         if event <> invalid then
+            result.status = event.GetResponseCode()
             if event.GetResponseCode() = 200 then
                 raw = event.GetString()
                 if Len(raw) <= 140000 then

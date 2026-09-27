@@ -2,7 +2,11 @@
 
 Prepared 2026-09-27. **Not submitted. Not certified.** The public v1.7 source snapshot is not yet a distributable consumer release.
 
-## Draft listing (conditional on provider permission)
+## Current development status
+
+The original audit below describes the pre-implementation snapshot. This branch now implements deep-link handling, launch/authentication reporting, account-bound helper sessions and original artwork. See the maintained [implementation/proof status](store/STATUS.md), [listing draft](store/LISTING.md) and [device acceptance matrix](store/DEVICE_ACCEPTANCE.md). None of these additions has yet passed native certification. The publisher states that a Roku Developer account exists and the intended unofficial paid-account client use complies with provider terms; dashboard access and publisher declarations have not been independently verified.
+
+## Original draft listing (superseded by store/LISTING.md)
 
 - Working app name: **30nama** (requires brand authorization).
 - App type/category candidate: Video / Movies & TV.
@@ -12,7 +16,7 @@ Prepared 2026-09-27. **Not submitted. Not certified.** The public v1.7 source sn
 - Countries, domestic region, age rating, made-for-kids classification and monetization: **publisher inputs required; not guessed**.
 - Support URL/email/phone, administrative and technical contacts, privacy URL and terms URL: **required; not yet supplied**.
 
-## Readiness matrix
+## Original pre-implementation audit (historical; see current status above)
 
 | Gate | Evidence / remaining action |
 | --- | --- |

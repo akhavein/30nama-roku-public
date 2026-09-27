@@ -432,6 +432,8 @@ sub OnList()
                 m.api.token = ""
                 m.syncToken = ""
                 m.userId = 0
+                ClearLocalViewingData()
+                m.registry.Delete("account_owner")
                 m.registry.Delete("session_token")
                 m.registry.Flush()
                 ShowAccount()
@@ -445,6 +447,8 @@ sub OnList()
             m.registry.Write("autoplay",value)
             m.registry.Flush()
             ShowAccount()
+        else if action = "clear-local" then
+            ConfirmClearLocalData()
         else if action = "cloud-watchlist" then
             ShowCloudWatchlist()
         else if action = "preferences" then

@@ -1,6 +1,6 @@
 # Find scene (v1.7)
 
-During playback press **Up → Scenes → OK**. The scene browser pauses the current video. Left/Right adjusts by the saved step, FF/Rewind by the saved skip interval, and Replay moves backward. **OK** (or Play) seeks to the selected time; **Back** cancels without seeking. Both preserve whether playback was originally playing or paused. Existing quick skip/replay controls are unchanged.
+During active playback press **FF/Rewind**, or **Up → Scenes → OK**. The scene browser pauses the current video. Left/Right adjusts by the saved step, FF/Rewind by the saved skip interval, and Replay moves backward. **OK** (or Play) seeks to the selected time; **Back** cancels without seeking. Both preserve whether playback was originally playing or paused. Left/Right and Replay outside the browser remain immediate interval seeks; FF/Rewind now opens the confirm/cancel browser.
 
 Frames are real, small images decoded from the selected stream, not title artwork. They are labelled “Scene near” because media timestamps and keyframe alignment are not frame-exact editorial markers. A missing/slow/expired/unsupported preview never disables time selection, ordinary playback or subtitles. The selected time changes immediately; generation is debounced, old responses are ignored, and cancel/close/sleep invalidate pending requests. Temporary image paths use a random per-launch namespace to prevent Roku's image cache from reusing another session's frame. At most three temporary image files are kept and cleared when the browser closes.
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SessionTask" extends="Task">
+  <interface>
+    <field id="origin" type="string" />
+    <field id="token" type="string" />
+    <field id="deviceId" type="string" />
+    <field id="revoke" type="boolean" />
+    <field id="epoch" type="integer" />
+    <field id="result" type="assocarray" alwaysNotify="true" />
+  </interface>
+  <script type="text/brightscript" uri="pkg:/components/SessionTask.brs" />
+</component>

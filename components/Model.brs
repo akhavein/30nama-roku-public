@@ -737,6 +737,7 @@ function RemoteSeconds(kind as String) as Integer
     choices = [5,10,15,30]
     fallback = 10
     if kind = "skip" then choices = [10,30,60]: fallback = 30
+    if kind = "replay" then choices = [10,15,20,25]
     for each choice in choices
         if value = choice then return value
     end for

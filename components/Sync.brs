@@ -59,6 +59,7 @@ end sub
 
 sub FlushProgressQueue()
     if m.api.token = "" or m.tasks.DoesExist("progress") then return
+    if Text(m.managedOrigin) <> "" and m.helperToken = "" then EnsureManagedSession(): return
     if not IsList(m.progressQueue) then return
     if m.progressQueue.Count() = 0 then return
     payload = m.progressQueue.Shift()
@@ -124,6 +125,7 @@ sub CancelOlderMediaProgress()
 end sub
 
 sub InvalidateSessionRequests()
+    RevokeManagedSession()
     m.sessionEpoch = SafeInt(m.sessionEpoch) + 1
     m.cloudIds = invalid
     m.cloudClickClock = invalid
@@ -132,6 +134,7 @@ sub InvalidateSessionRequests()
     m.cloudFocusId = 0
     m.cloudPage = 1: m.cloudPages = 1
     if m.cloudVerifyTimer <> invalid then m.cloudVerifyTimer.control = "stop"
+    m.storeAuthReported = false
     m.userId = 0
     m.syncToken = ""
     m.syncMedia = invalid
