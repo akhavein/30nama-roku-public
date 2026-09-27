@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-27",
+  "scope": "Provider API and authenticated website only; no native Roku acceptance",
+  "accounts": 1,
+  "checks": {
+    "device_code_created_without_account_token": true,
+    "device_code_approved_on_provider_website": true,
+    "device_token_issued": true,
+    "device_token_distinct_from_website_token": true,
+    "profile_request_with_device_token_succeeded": true,
+    "streaming_entitlement_present": true,
+    "temporary_device_logout_succeeded": true,
+    "temporary_device_token_rejected_after_logout": true,
+    "website_session_valid_after_cleanup": true
+  },
+  "newer_sdk": {
+    "package": "@30nama/sdk@1.8.7",
+    "password_login_method_declared": true,
+    "credentials_sent": false,
+    "world_test_status": 403,
+    "world_test_cloudflare_challenge": true,
+    "world_qr_status": 403,
+    "ir_test_status": 403,
+    "on_device_login_verified": false
+  },
+  "roku_native_signin_verified": false,
+  "store_authentication_gate_passed": false,
+  "submitted_or_scheduled": false
+}

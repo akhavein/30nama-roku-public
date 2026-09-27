@@ -38,6 +38,15 @@
 - Added container restart policies and gateway/browser-backed helper health checks; enabled the isolated browser and tunnel at boot. Six live restart checks passed, including old-credential invalidation, re-enrollment, fresh subtitle delivery after browser/container restart, and revocation. A first probe attempted subtitles before browser readiness and returned 503; the final acceptance waits for the browser-backed helper readiness check. No native automatic-renewal claim follows from a script manually re-enrolling.
 - Re-ran the 12 gateway regression tests successfully. Evidence: `GATEWAY-RESTART-2026-09-27.json`. One real provider account only; no TV install or playback/history change in this follow-up.
 
+## Supported login investigation on 2026-09-27
+
+- Completed owner-assisted OTP authentication on the provider's normal website, and verified a paid, streaming-entitled account. No OTP, password, email, account ID or session token is included in this record.
+- Verified the provider's official Easy Login contract from `official-30nama-api@1.3.198`: create an unauthenticated device code, approve that code on the authenticated provider website, then poll for a device token. A live probe issued a token distinct from the website session, and a separate profile request confirmed it was usable. This was an API/browser experiment, **not a Roku installation or native playback test**.
+- Logged out only that temporary device token. A subsequent profile request rejected it; the original website session remained valid. No household app session, history, deployment or Roku package was changed.
+- This does **not** resolve Store sign-in. Roku explicitly permits rendezvous linking only for TV Everywhere (cable/satellite credentials) apps, and otherwise requires authentication entirely on-device. This provider subscription app is not shown to qualify for that exception. See [Roku rendezvous linking](https://developer.roku.com/dev/docs/authentication-and-linking) and [Roku Pay requirements](https://developer.roku.com/dev/docs/roku-pay-requirements).
+- Inspected official `@30nama/sdk@1.8.7`, which declares a newer `operatorWebLogin(identity,password)` method. The SDK-referenced WORLD endpoint returned HTTP 403 with a Cloudflare challenge to noncredentialed test/QR requests; the IR endpoint test also returned HTTP 403. No credentials were sent there. A method declaration is **not** evidence of a working Roku-compatible authentication service.
+- No device-link flow was added to the Store build, no automated-review scripts were fabricated, and no publication was scheduled. Provider cooperation for supported on-device authentication and Roku confirmation of the app's classification are unresolved external dependencies. Prepared support-request drafts privately; nothing was sent.
+
 ## Not yet completed / must not be reported as passed
 
 - Gateway production endpoint/deployment, live multi-account provider validation, provider/browser compatibility with cookie omission, measured public load and monitoring. Protective caps are not capacity proof.
@@ -51,7 +60,7 @@
 ## Inputs/actions needed to finish
 
 - Worldwide selection is now saved. Finalize support/policies with actual deployment facts; do not turn the analysis-only upload into a release candidate until operational gates pass.
-- Resolve OTP/password/CAPTCHA compatibility for Roku automated authentication. Owner-authorized reviewer credentials are already saved; do not ask for the same phone or credentials again. A second authorized live provider account is still needed for the distinct-account acceptance gate.
+- Obtain a provider-supported on-device authentication integration and resolve the Roku classification requirements. Website OTP and Easy Login have been proven, but Easy Login is not an established certification path for this app. Owner-authorized reviewer credentials are already saved; do not ask for the same phone or credentials again. A second authorized live provider account is still needed for the distinct-account acceptance gate.
 - Additional required hardware or Roku testing access remains necessary; full approval allowed testing on the idle household TCL in this session.
 - Verify provider-supported preview formats/source coverage, and complete native caption work before a public certification claim.
 
