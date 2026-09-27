@@ -125,6 +125,7 @@ sub CancelOlderMediaProgress()
 end sub
 
 sub InvalidateSessionRequests()
+    if IsMap(m.easyState) then EasyLoginFailure("Session changed. Get a new code to continue.")
     RevokeManagedSession()
     m.sessionEpoch = SafeInt(m.sessionEpoch) + 1
     m.cloudIds = invalid

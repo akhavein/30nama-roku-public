@@ -5,7 +5,9 @@ end sub
 sub executeRequest()
     timer = CreateObject("roTimespan")
     timer.Mark()
-    print "[30nama][api] start id="; m.top.requestId; " action="; m.top.action
+    logAction = m.top.action
+    if Left(m.top.tag,5) = "easy-" then logAction = m.top.tag
+    print "[30nama][api] start id="; m.top.requestId; " action="; logAction
     req = CreateObject("roUrlTransfer")
     port = CreateObject("roMessagePort")
     req.SetMessagePort(port)
@@ -67,13 +69,13 @@ sub executeRequest()
     if raw = invalid then
         req.AsyncCancel()
         m.top.httpStatus = 0
-        print "[30nama][api] end id="; m.top.requestId; " action="; m.top.action; " status=no_response elapsed_ms="; m.top.elapsedMs
+        print "[30nama][api] end id="; m.top.requestId; " action="; logAction; " status=no_response elapsed_ms="; m.top.elapsedMs
         m.top.result = {success:false, error:"no_response"}
         return
     end if
     if type(raw) = "Integer" then
         m.top.httpStatus = raw
-        print "[30nama][api] end id="; m.top.requestId; " action="; m.top.action; " status="; raw; " elapsed_ms="; m.top.elapsedMs
+        print "[30nama][api] end id="; m.top.requestId; " action="; logAction; " status="; raw; " elapsed_ms="; m.top.elapsedMs
         m.top.result = {success:false, error:"http_status", status:raw}
         return
     end if
@@ -86,12 +88,12 @@ sub executeRequest()
     parsed = ParseJson(raw)
     if m.top.tag = "helper-health" and GetInterface(parsed,"ifAssociativeArray") <> invalid then parsed.success = parsed.ok = true
     if GetInterface(parsed,"ifAssociativeArray") = invalid then
-        print "[30nama][api] end id="; m.top.requestId; " action="; m.top.action; " status=invalid_json elapsed_ms="; m.top.elapsedMs
+        print "[30nama][api] end id="; m.top.requestId; " action="; logAction; " status=invalid_json elapsed_ms="; m.top.elapsedMs
         m.top.result = {success:false, error:"invalid_json"}
     else
         successText = "invalid"
         if GetInterface(parsed.success,"ifToStr") <> invalid then successText = parsed.success.ToStr()
-        print "[30nama][api] end id="; m.top.requestId; " action="; m.top.action; " status="; m.top.httpStatus; " success="; successText; " elapsed_ms="; m.top.elapsedMs
+        print "[30nama][api] end id="; m.top.requestId; " action="; logAction; " status="; m.top.httpStatus; " success="; successText; " elapsed_ms="; m.top.elapsedMs
         m.top.result = parsed
     end if
 end sub

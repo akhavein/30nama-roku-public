@@ -51,10 +51,9 @@ def main():
     launch('empty-continue');expect('empty Continue has helpful message',lambda s:s.get('page')=='continue' and 'Nothing to resume' in s.get('empty',''))
     for scenario,part in [('stream:200','No playable'),('stream:103','No compatible'),('stream:401','expired'),('stream:500','unavailable'),('stream:102','Playback failed')]:
         launch(scenario);expect(scenario,lambda s:part in s.get('status',''),20)
-    for scenario,part in [('login-empty','enter a value'),('login-invalid','valid email'),('login-send','one-time code'),('login-otp-invalid','failed')]:
-        launch(scenario);expect(scenario,lambda s:any(part in x for x in s.get('message',[])))
-    mark();keys('Back');expect('login Cancel returns to account',lambda s:s.get('page')=='account' and 'message' not in s)
-    launch('login-success');expect('synthetic OTP success persists session',lambda s:s.get('signedin') and 'successfully' in s.get('status',''))
+    launch('easy-pending');expect('Easy Login renders native QR',lambda s:s.get('easyqr')=='ready' and s.get('easyphase')=='waiting',20)
+    mark();keys('Back');expect('login Cancel returns to account',lambda s:s.get('page')=='account' and not s.get('signedin'))
+    launch('easy-success');expect('synthetic Easy Login verifies and persists session',lambda s:s.get('signedin') and 'successfully' in s.get('status',''),20)
     launch('stream:101');expect('fixture movie reaches native playback',lambda s:s.get('player')=='playing',12)
     expect('movie completion leaves Continue',lambda s:s.get('page')=='title' and any(x.get('completed') for x in s.get('history',[])),20)
     launch('stream:201');expect('seasons sort numerically',lambda s:s.get('page')=='seasons' and s.get('items',[])[:4]==['Season 1   ·   2 episodes','Season 2   ·   2 episodes','Season 10   ·   2 episodes','Season 12   ·   2 episodes'])

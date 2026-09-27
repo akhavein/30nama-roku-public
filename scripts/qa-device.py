@@ -47,6 +47,7 @@ class Handler(SimpleHTTPRequestHandler):
     health_count = 0
     search_counts = {}
     subtitle_counts = {}
+    easy_codes = 0
     def __init__(self,*a,**kw):super().__init__(*a,directory=str(ROOT/'build/qa-media'),**kw)
     def log_message(self,*args):pass
     def allowed(self):return self.client_address[0] in [ROKU,HOST,'127.0.0.1']
@@ -88,7 +89,21 @@ class Handler(SimpleHTTPRequestHandler):
         if action.startswith('case/'):
             _,mode,action=action.split('/',2)
         if mode not in self.cloud_stores:self.cloud_stores[mode]=set() if mode=='empty' else {101,201,104}
-        if action=='user_mylist':
+        if action=='qrcode/':
+            type(self).easy_codes+=1
+            code=f'TEST{type(self).easy_codes:04d}'
+            result={'code':code,'url':'https://30nama.com/auth/'+code}
+            if mode=='easy-invalid':result['url']='https://example.invalid/'+code
+            if self.headers.get('c-token'):status=400
+        elif action.startswith('qrlogin/code/'):
+            if mode=='easy-success':result={'usertoken':'easy-fixture-session'}
+            elif mode=='easy-expired':status=410
+            else:raw=b'{"success":false}'
+            if self.headers.get('c-token'):status=400;raw=None
+        elif action=='user' and mode.startswith('easy-'):
+            if self.headers.get('c-token')=='easy-fixture-session':result={'userid':42,'usertoken':'easy-fixture-session'}
+            else:status=401
+        elif action=='user_mylist':
             self.cloud_reads[mode]=self.cloud_reads.get(mode,0)+1
             if mode=='preflight' and self.cloud_reads[mode]==2:status=503
             if mode=='authfail':status=401

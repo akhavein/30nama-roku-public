@@ -58,7 +58,7 @@ try:
     time.sleep(4.5)
     q.expect('late old reply cannot replace current episode', playing(201, 21), 3)
     cold('101', 'movie', signedout=True)
-    q.expect('signed-out link waits for login', lambda s: s.get('storepending') and s.get('page') == 'account' and bool(s.get('message')), 10)
+    q.expect('signed-out link waits for login', lambda s: s.get('storepending') and s.get('page') == 'easy-login' and s.get('easycodepresent'), 10)
     q.mark()
     q.keys('Back')
     q.expect('cancel sign-in clears pending link', lambda s: not s.get('storepending') and s.get('page') == 'account', 8)

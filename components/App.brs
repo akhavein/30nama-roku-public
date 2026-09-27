@@ -49,7 +49,7 @@ sub init()
         m["remote_" + kind] = SafeInt(m.registry.Read("remote_" + kind))
     end for
     m.autoplay = m.registry.Read("autoplay") <> "off"
-    for each id in ["shell", "nav", "heading", "status", "browse", "previewTitle", "previewMeta", "rails", "detail", "detailPoster", "detailTitle", "detailMeta", "detailPlot", "actions", "list", "empty", "hint", "playerScreen", "player", "playbackStatus", "controls", "playerTitle", "playerMeta", "playerTime", "timeline", "controlButtons", "trackPicker", "trackHeading", "trackList", "saveTimer", "overlayTimer", "captionLayer", "captionText", "captionNotice", "seekPauseTimer", "captionBackground", "bufferTimer", "nextCountdown", "nextCountdownText", "nextTimer", "healthTimer", "seekCommitTimer", "seekNotice", "syncRetryTimer", "searchQueryLabel", "sleepTimer", "watchPrompt", "introPrompt", "cloudVerifyTimer", "scenePreview", "previewImage", "previewTime", "previewStatus", "previewTimer"]
+    for each id in ["shell", "nav", "heading", "status", "browse", "previewTitle", "previewMeta", "rails", "detail", "detailPoster", "detailTitle", "detailMeta", "detailPlot", "actions", "list", "empty", "hint", "playerScreen", "player", "playbackStatus", "controls", "playerTitle", "playerMeta", "playerTime", "timeline", "controlButtons", "trackPicker", "trackHeading", "trackList", "saveTimer", "overlayTimer", "captionLayer", "captionText", "captionNotice", "seekPauseTimer", "captionBackground", "bufferTimer", "nextCountdown", "nextCountdownText", "nextTimer", "healthTimer", "seekCommitTimer", "seekNotice", "syncRetryTimer", "searchQueryLabel", "sleepTimer", "watchPrompt", "introPrompt", "cloudVerifyTimer", "scenePreview", "previewImage", "previewTime", "previewStatus", "previewTimer", "easyPanel", "easyQr", "easyCode", "easyCountdown", "easyButtons", "easyTimer"]
         m[id] = m.top.findNode(id)
     end for
     for each pair in [{node:m.list,size:23},{node:m.actions,size:18}]
@@ -59,6 +59,8 @@ sub init()
         pair.node.font = font
         pair.node.focusedFont = font
     end for
+    m.easyTimer.observeField("fire","OnEasyLoginTick")
+    m.easyButtons.observeField("itemSelected","OnEasyLoginButton")
     m.previewImage.observeField("loadStatus","OnPreviewImageStatus")
     m.previewFiles = []
     m.previewSerial = 0
@@ -163,6 +165,7 @@ end function
 
 sub EnterPage(page as String, heading as String)
     CancelPageRequests()
+    StopEasyLogin()
     m.generation = m.generation + 1
     m.page = page
     m.heading.text = heading
@@ -213,7 +216,7 @@ sub Request(tag as String, action as String, payload as Object)
     task.platform = m.api.platform
     task.language = m.api.language
     task.sessionEpoch = SafeInt(m.sessionEpoch)
-    task.token = m.api.token
+    task.token = ProviderRequestToken(tag,m.api.token,m.easyCandidate)
     if tag = "progress" and Text(m.syncToken) <> "" then task.token = m.syncToken
     task.action = action
     task.tag = tag
@@ -240,8 +243,8 @@ sub OnApiResult(event as Object)
     if task.sessionEpoch <> invalid and task.sessionEpoch <> SafeInt(m.sessionEpoch) then return
     m.stats.requests = m.stats.requests + 1
     ok = IsMap(result) and Truth(result.success)
-    if not ok then m.stats.failures = m.stats.failures + 1
-    if task.httpStatus = 401 and tag <> "helper-health" and tag <> "progress" and tag <> "login" then
+    if not ok and tag <> "easy-poll" then m.stats.failures = m.stats.failures + 1
+    if task.httpStatus = 401 and tag <> "helper-health" and tag <> "progress" and tag <> "login" and Left(tag,5) <> "easy-" then
         InvalidateSessionRequests()
         m.api.token = ""
         m.syncToken = ""
@@ -250,11 +253,13 @@ sub OnApiResult(event as Object)
         m.registry.Flush()
     end if
     if (tag = "progress" or tag = "helper-health") and task.httpStatus = 401 then RefreshManagedSession()
-    if task.httpStatus = 401 and IsMap(m.pendingStoreLink) and tag <> "progress" and tag <> "helper-health" and tag <> "login" then
+    if task.httpStatus = 401 and IsMap(m.pendingStoreLink) and tag <> "progress" and tag <> "helper-health" and tag <> "login" and Left(tag,5) <> "easy-" then
         OnStoreLink()
         return
     end if
-    if Left(tag,6) = "store-" then
+    if Left(tag,5) = "easy-" then
+        HandleEasyLogin(tag,result,task.httpStatus)
+    else if Left(tag,6) = "store-" then
         HandleStoreResult(tag,result)
     else if Left(tag,6) = "cloud-" then
         HandleCloudResult(tag,result,task.httpStatus)
@@ -342,12 +347,13 @@ sub ShowAccount()
     m.listActions = ["auth", "refresh", "diagnostics", "autoplay", "verifyLogin", "preferences", "cloud-watchlist", "clear-local"]
     autoLabel = "Autoplay next episode: Off"
     if m.autoplay then autoLabel = "Autoplay next episode: On"
-    m.list.content = MakeLabels([auth, "Refresh catalog", "Connection diagnostics", autoLabel, "Verify sign-in with a fresh code", "Playback preferences", "30nama account Watchlist", "Clear viewing data on this TV"])
+    m.list.content = MakeLabels([auth, "Refresh catalog", "Connection diagnostics", autoLabel, "Link another account", "Playback preferences", "30nama account Watchlist", "Clear viewing data on this TV"])
     m.list.visible = true
     m.list.setFocus(true)
 end sub
 
 sub ShowLoginKeyboard(kind as String)
+    if kind = "email" then ShowEasyLogin(): return
     m.loginKind = kind
     if m.keyboard <> invalid then CloseKeyboard()
     m.top.SignalBeacon("AppDialogInitiate")
@@ -471,6 +477,16 @@ end sub
 function onKeyEvent(key as String, press as Boolean) as Boolean
     if not press then return false
     OnViewerActivity()
+    if m.page = "easy-login" then
+        if key = "back" then
+            m.pendingStoreLink = invalid
+            ShowAccount()
+            QueueStoreRendered()
+            return true
+        end if
+        if key = "left" or key = "right" then return true
+        return false
+    end if
     if m.page = "player" then return PlayerKey(key)
     if m.keyboard <> invalid then
         if key = "back" then

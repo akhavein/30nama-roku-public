@@ -20,6 +20,7 @@
   <script type="text/brightscript" uri="pkg:/components/StoreModel.brs" />
   <script type="text/brightscript" uri="pkg:/components/Store.brs" />
   <script type="text/brightscript" uri="pkg:/components/Service.brs" />
+  <script type="text/brightscript" uri="pkg:/components/EasyLogin.brs" />
 <children>
     <Group id="shell">
       <Rectangle width="1280" height="720" color="0x0b0d12ff" />
@@ -42,6 +43,15 @@
         <Label id="detailMeta" translation="[550,266]" width="650" height="36" font="font:SmallBoldSystemFont" color="0xe5b46aff" />
         <Label id="detailPlot" translation="[550,310]" width="650" height="118" wrap="true" font="font:SmallSystemFont" color="0xa9b3c3ff" />
         <LabelList vertFocusAnimationStyle="floatingFocus" id="actions" translation="[550,438]" itemSize="[590,36]" itemSpacing="[0,3]" numRows="5" focusedColor="0x0b0d12ff" />
+      </Group>
+      <Group id="easyPanel" visible="false">
+        <Poster id="easyQr" translation="[286,184]" loadDisplayMode="noScale" />
+        <Label text="Or open on your phone:" translation="[706,178]" width="500" height="36" font="font:SmallSystemFont" />
+        <Label text="30nama.com/auth" translation="[706,220]" width="500" height="42" font="font:MediumBoldSystemFont" color="0xe5b46aff" />
+        <Label text="Enter this code, then approve:" translation="[706,276]" width="500" height="36" font="font:SmallSystemFont" />
+        <Label id="easyCode" translation="[706,314]" width="500" height="80" wrap="true" font="font:MediumBoldSystemFont" />
+        <Label id="easyCountdown" translation="[706,394]" width="500" height="34" font="font:SmallSystemFont" color="0xa9b3c3ff" />
+        <LabelList id="easyButtons" translation="[706,454]" itemSize="[460,50]" itemSpacing="[0,12]" numRows="2" focusedColor="0x0b0d12ff" />
       </Group>
       <LabelList vertFocusAnimationStyle="floatingFocus" id="list" translation="[280,176]" itemSize="[910,56]" itemSpacing="[0,8]" numRows="7" focusedColor="0x0b0d12ff" visible="false" />
       <Label id="empty" translation="[280,260]" width="900" height="160" wrap="true" font="font:MediumSystemFont" color="0xa9b3c3ff" visible="false" />
@@ -103,6 +113,7 @@ OK seeks · Back cancels" translation="[200,582]" width="880" height="90" wrap="
       <Label text="Playback is paused and your place is saved.
 OK / Play continues · Back stops" translation="[280,320]" width="720" height="130" wrap="true" horizAlign="center" font="font:MediumSystemFont" />
     </Group>
+    <Timer id="easyTimer" duration="1" repeat="true" />
     <Timer id="serviceTimer" duration="60" repeat="true" />
     <Timer id="storeRenderTimer" duration="0.1" repeat="false" />
     <Timer id="previewTimer" duration="0.35" repeat="false" />

@@ -8,6 +8,10 @@ Unofficial, native SceneGraph/BrightScript TV client for 30nama. Designed for re
 
 This branch adds cold/warm deep links, Roku authentication reporting and launch beacons, short-lived account-bound helper sessions, account-switch/local-data clearing, original unofficial artwork, and initial system-caption/transport changes. It is **not native-verified or certified**. See [implementation status](docs/store/STATUS.md), [gateway setup](service/README.md), and [native acceptance matrix](docs/store/DEVICE_ACCEPTANCE.md).
 
+## Easy Login feature branch
+
+This branch adds **Account → Sign in with your phone**, with an on-TV QR/code, automatic account verification, bounded polling, expiry and cancellation. QR images are generated locally. It is intended for sideload testing; native TV acceptance is pending and this off-device flow is not represented as Store-approved. See [Easy Login and verification](docs/EASY_LOGIN.md).
+
 ## Features
 
 - Poster-led browsing, movie/series details and ordered season/episode navigation.
@@ -87,3 +91,5 @@ Account → Playback preferences contains intervals, sleep and still-watching se
 The private precursor passed 403 BrightScript assertions, 6 helper tests, 11 worker tests and 106 native device checks. Real preview images were observed. Those historical results are not a claim that every public configuration has passed device acceptance. Final v1.7 reinstall/resume is pending, viewer-profile sync is absent, and physical audio/video/lip-sync cannot be established from installer screenshots.
 
 This repository starts with fresh history. Private deployment records, account captures, credentials and runtime/build output are intentionally omitted. Use your own lawful service access and content permissions. Bundled font attribution and SIL Open Font License are in [components/fonts](components/fonts/README.md). No additional license grant for project source is declared by this publication.
+
+The bundled QR encoder derives from Paramount/Project Nayuki under the [MIT license](components/qr/LICENSE.txt); upstream notices and local adaptation details are retained.

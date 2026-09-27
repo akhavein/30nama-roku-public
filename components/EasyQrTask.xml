@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="EasyQrTask" extends="Task">
+<interface>
+<field id="text" type="string" />
+<field id="path" type="string" />
+<field id="serial" type="integer" />
+<field id="result" type="assocarray" />
+</interface>
+<script type="text/brightscript" uri="pkg:/components/EasyQrTask.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrCode.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrCode.high.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrCode.mid.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrCode.low.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrCode.draw.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrCode.mask.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrCode.help.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrSegment.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrCode.utils.brs" />
+<script type="text/brightscript" uri="pkg:/components/qr/qrMode.brs" />
+</component>

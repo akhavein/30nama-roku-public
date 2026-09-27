@@ -7,7 +7,7 @@ sub Main()
     m.page = "home"
     m.cancelled = []
     OnStoreLink()
-    Assert(m.page = "account" and m.loginShown,"unauthenticated deep link opens on-device login")
+    Assert(m.page = "account" and m.loginShown,"unauthenticated deep link opens sign-in")
     Assert(m.pendingStoreLink.episodeId = 12,"login retains validated episode target")
     m.api.token = "fixture"
     ResumeStoreLink()

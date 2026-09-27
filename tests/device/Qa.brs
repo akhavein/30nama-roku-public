@@ -130,20 +130,10 @@ sub OnQaScenario()
         ShowLoginKeyboard("otp")
         m.keyboard.text = "401401"
         OnLoginKeyboard()
-    else if Left(scenario,5) = "login" then
+    else if Left(scenario,5) = "easy-" then
         m.api.token = ""
-        ShowAccount()
-        if scenario <> "login-otp-invalid" and scenario <> "login-success" then ShowLoginKeyboard("email")
-        if scenario = "login-empty" then OnLoginKeyboard()
-        if scenario = "login-invalid" then m.keyboard.text = "invalid": OnLoginKeyboard()
-        if scenario = "login-send" then m.keyboard.text = "qa@example.invalid": OnLoginKeyboard()
-        if scenario = "login-otp-invalid" or scenario = "login-success" then
-            m.loginEmail = "qa@example.invalid"
-            ShowLoginKeyboard("otp")
-            m.keyboard.text = "999999"
-            if scenario = "login-success" then m.keyboard.text = "123456"
-            OnLoginKeyboard()
-        end if
+        m.api.base = "http://QA_HOST_PLACEHOLDER:8765/api/case/" + scenario
+        ShowEasyLogin()
     else if Left(scenario,7) = "stream:" then
         id = SafeInt(Mid(scenario,8))
         if id = 109 then m.bufferTimer.duration = 3
@@ -186,6 +176,10 @@ sub QaState()
         end if
     end if
     state = {scenario:m.qaScenario,page:m.page,status:m.status.text,player:m.player.state,position:SafeInt(m.player.position),tracks:m.trackPicker.visible,empty:m.empty.text,railFocus:m.rails.rowItemFocused,trackFocus:m.trackList.hasFocus(),buttonsFocus:m.controlButtons.hasFocus(),currentCaption:m.player.globalCaptionMode,selectedCaption:m.player.subtitleTrack = m.player.currentSubtitleTrack,control:m.controlIndex,history:m.history,searchPage:m.searchPage,searchPages:m.searchPages,results:m.searchItems.Count(),signedIn:m.api.token <> ""}
+    state.easyphase = ""
+    if IsMap(m.easyState) then state.easyphase = m.easyState.phase
+    state.easyqr = m.easyQr.loadStatus
+    state.easycodepresent = Len(m.easyCode.text) > 0
     state.cloudknown = IsMap(m.cloudIds)
     state.cloudids = []
     if IsMap(m.cloudIds) then state.cloudids = m.cloudIds.Keys()
