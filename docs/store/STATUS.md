@@ -45,7 +45,14 @@
 - Logged out only that temporary device token. A subsequent profile request rejected it; the original website session remained valid. No household app session, history, deployment or Roku package was changed.
 - This does **not** resolve Store sign-in. Roku explicitly permits rendezvous linking only for TV Everywhere (cable/satellite credentials) apps, and otherwise requires authentication entirely on-device. This provider subscription app is not shown to qualify for that exception. See [Roku rendezvous linking](https://developer.roku.com/dev/docs/authentication-and-linking) and [Roku Pay requirements](https://developer.roku.com/dev/docs/roku-pay-requirements).
 - Inspected official `@30nama/sdk@1.8.7`, which declares a newer `operatorWebLogin(identity,password)` method. The SDK-referenced WORLD endpoint returned HTTP 403 with a Cloudflare challenge to noncredentialed test/QR requests; the IR endpoint test also returned HTTP 403. No credentials were sent there. A method declaration is **not** evidence of a working Roku-compatible authentication service.
-- No device-link flow was added to the Store build, no automated-review scripts were fabricated, and no publication was scheduled. Provider cooperation for supported on-device authentication and Roku confirmation of the app's classification are unresolved external dependencies. Prepared support-request drafts privately; nothing was sent.
+- No device-link flow was added to the Store build, no automated-review scripts were fabricated, and no publication was scheduled. Provider cooperation for supported on-device authentication and Roku confirmation of the app's classification are unresolved external dependencies. Support-request drafts were prepared privately; follow-up delivery is recorded below.
+
+## Approved support outreach on 2026-09-27
+
+- The publisher explicitly authorized both support requests and necessary publication work. Sent the provider integration/authentication/public-distribution questions in Persian through the official provider website support chat. The conversation displays the sent message; no provider answer or approval has been received.
+- Prepared Roku Partner Success's Certification contact form with app ID, developer contact and classification/on-device authentication questions. **Not sent:** its Submit control remains disabled pending a human CAPTCHA. The official email alternative also could not send because the configured Gmail OAuth grant returned `invalid_grant`. No successful Roku support submission or ticket is claimed.
+- Left the prepared form available for the publisher to complete the manual step; no additional publication approval is needed. Credentials, codes and tokens were excluded from support-request content.
+- Hosted CI for authentication evidence commit `68e70d1` completed successfully. This is source-check evidence, not native acceptance or Store certification. No new package was installed or scheduled.
 
 ## Not yet completed / must not be reported as passed
 
