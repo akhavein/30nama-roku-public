@@ -1,0 +1,137 @@
+{
+  "date": "2026-09-27",
+  "status": "candidate-not-submitted",
+  "device": {
+    "model-number": "C104X",
+    "model-name": "55S425-CA",
+    "software-version": "16.0.4",
+    "software-build": "815",
+    "is-tv": "true"
+  },
+  "nativeDeepLinks": {
+    "passed": 14,
+    "total": 14,
+    "checks": [
+      {
+        "test": "cold movie launches directly into native playback",
+        "passed": true
+      },
+      {
+        "test": "launch completion beacon reported after player ready",
+        "passed": true
+      },
+      {
+        "test": "warm exact episode replaces movie",
+        "passed": true
+      },
+      {
+        "test": "season link opens episodes without autoplay",
+        "passed": true
+      },
+      {
+        "test": "missing episode falls back safely",
+        "passed": true
+      },
+      {
+        "test": "URL is rejected as content ID",
+        "passed": true
+      },
+      {
+        "test": "cold exact episode bypasses title chooser",
+        "passed": true
+      },
+      {
+        "test": "unwatched series starts first regular episode",
+        "passed": true
+      },
+      {
+        "test": "latest rapid link wins over slow old request",
+        "passed": true
+      },
+      {
+        "test": "late old reply cannot replace current episode",
+        "passed": true
+      },
+      {
+        "test": "signed-out link waits for login",
+        "passed": true
+      },
+      {
+        "test": "cancel sign-in clears pending link",
+        "passed": true
+      },
+      {
+        "test": "Back from account returns Home",
+        "passed": true
+      },
+      {
+        "test": "Home Back exits app",
+        "passed": true
+      }
+    ]
+  },
+  "qaPackageSha256": "9cf27d78bca956bbdefa78d05b8e9ab6a30b2090c4b76faa1670086388424311",
+  "gateway": {
+    "checks": [
+      {
+        "case": "gateway liveness",
+        "status": 200,
+        "passed": true
+      },
+      {
+        "case": "unauthenticated denied",
+        "status": 401,
+        "passed": true
+      },
+      {
+        "case": "invalid provider session denied",
+        "status": 401,
+        "passed": true
+      },
+      {
+        "case": "live account enrollment",
+        "status": 200,
+        "passed": true,
+        "ms": 190
+      },
+      {
+        "case": "second device same account enrollment",
+        "status": 200,
+        "passed": true
+      },
+      {
+        "case": "wrong account owner denied before forwarding",
+        "status": 403,
+        "passed": true
+      },
+      {
+        "case": "revocation",
+        "status": 200,
+        "passed": true
+      },
+      {
+        "case": "revoked session denied",
+        "status": 401,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "accountsTested": 1,
+    "multiAccountAcceptance": false
+  },
+  "restore": {
+    "cleanPreexistingAppRestored": true,
+    "sha256": "fc28d7b16bc94ac06203112d7918ccacc2a53b580152a303ded9088b1b4e3b49"
+  },
+  "notVerified": [
+    "all caption styles and native/custom interaction",
+    "full-catalog trick-play coverage",
+    "two distinct live provider accounts",
+    "live helper subtitle/progress forwarding",
+    "public HTTPS, rate controls, capacity and monitoring",
+    "signing and encrypted .pkg",
+    "reviewer account",
+    "multi-model physical AV and accessibility",
+    "Roku analyzers and certification"
+  ]
+}

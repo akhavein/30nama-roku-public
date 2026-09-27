@@ -5,6 +5,7 @@ sub OnQaScenario()
     m.qaScenario = scenario
     if Left(scenario,9) = "autoplay:" then m.autoplay = true: scenario = "stream:" + Mid(scenario,10)
     m.api.token = "fixture"
+    if scenario = "store-signedout" then m.api.token = ""
     m.history = []
     m.episodeHistory = []
     m.remote_step = 10: m.remote_skip = 30: m.remote_replay = 10
@@ -261,6 +262,9 @@ sub QaState()
     state.captioncycles = m.qaModeIteration
     state.autoplay = m.autoplay
     state.run = m.top.qaRun
+    state.storepending = IsMap(m.pendingStoreLink)
+    state.storereported = m.storeLaunchReported
+    if IsMap(m.title) then state.titleid = m.title.id
     state.helperstatus = m.helperStatus
     state.nextpending = m.nextPending
     state.nextremaining = m.nextRemaining

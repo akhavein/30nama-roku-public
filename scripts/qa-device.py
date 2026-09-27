@@ -130,7 +130,9 @@ class Handler(SimpleHTTPRequestHandler):
             if q=='shrink':result['pages']=1
             if q=='last':result['pages']=2
             if q=='unicode':result['posts']=[{'id':150,'title':'آزمایش فارسی 2026'}]
-        elif action.startswith('single/'):result={'id':int(action.split('/')[-1]),'title':'QA title','english_plot':'A synthetic fixture for device acceptance.'}
+        elif action.startswith('single/'):
+            ident=int(action.split('/')[-1])
+            result={'id':ident,'title':'QA title','is_series':ident in [200,201,202],'english_plot':'A synthetic fixture for device acceptance.'}
         elif action.startswith('stream/'):
             id=int(action.split('/')[-1])
             self.stream_counts[id]=self.stream_counts.get(id,0)+1

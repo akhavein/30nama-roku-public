@@ -1,4 +1,6 @@
-# Native Store candidate acceptance — not yet executed
+# Native Store candidate acceptance — partially executed
+
+On 2026-09-27, `scripts/qa-store.py` passed 14 native cases on the Store candidate, recorded in `VERIFICATION-2026-09-27.json`. This covers the cases named in that report, not the entire matrix below. All tests use synthetic content/account fixtures; they do not prove physical AV quality or Roku certification.
 
 Use an idle explicitly available test Roku; do not replace an actively watched sideload. Preserve the latest actual app/account state and clean restore package before testing. All synthetic runs use `30nama-test`. A passing simulator or mock backend cannot replace this gate.
 

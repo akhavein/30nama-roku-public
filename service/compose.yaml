@@ -20,7 +20,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
-    tmpfs: [/tmp:size=8m,mode=1777]
+    tmpfs: ["/tmp:size=8m,mode=1777"]
     logging:
       driver: json-file
       options:
