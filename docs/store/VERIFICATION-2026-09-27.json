@@ -129,9 +129,39 @@
     "two distinct live provider accounts",
     "live helper subtitle/progress forwarding",
     "public HTTPS, rate controls, capacity and monitoring",
-    "signing and encrypted .pkg",
     "reviewer account",
     "multi-model physical AV and accessibility",
-    "Roku analyzers and certification"
-  ]
+    "final Roku behavior analysis and certification"
+  ],
+  "dashboard": {
+    "appCreated": true,
+    "regions": 21,
+    "emailVerified": true,
+    "listingAssetsSaved": true,
+    "signedAnalysisCandidateUploaded": true,
+    "publicationSubmitted": false,
+    "published": false
+  },
+  "rsg13": {
+    "build": 2,
+    "localPackageChecksPassed": true,
+    "nativeDeepLinksPassed": 14,
+    "nativeDeepLinksTotal": 14,
+    "minimumFirmware": "15.1.0 b1",
+    "staticAnalysis": "repeat pending",
+    "previousStaticErrors": 0,
+    "previousStaticWarnings": 8,
+    "fixedWarnings": [
+      "RSG manifest version",
+      "minimum firmware",
+      "extraneous font README"
+    ],
+    "remainingRecommendations": [
+      "GetChannelAvailableMemory",
+      "EnableMemoryWarningEvent",
+      "GetMemoryLimitPercent",
+      "EnableLowGeneralMemoryEvent",
+      "GetChannelMemoryLimit"
+    ]
+  }
 }
