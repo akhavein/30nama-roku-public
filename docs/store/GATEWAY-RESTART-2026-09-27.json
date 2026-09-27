@@ -1,0 +1,45 @@
+{
+  "checks": [
+    {
+      "case": "pre-restart enrollment",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "case": "gateway restart invalidates prior credential",
+      "passed": true,
+      "status": 401
+    },
+    {
+      "case": "fresh enrollment after restart",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "case": "browser-backed helper ready after restart",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "case": "fresh subtitle after browser and container restart",
+      "passed": true,
+      "status": 200
+    },
+    {
+      "case": "post-restart revocation",
+      "passed": true,
+      "status": 200
+    }
+  ],
+  "passed": true,
+  "accountsTested": 1,
+  "clientAutoRenewalTested": false,
+  "date": "2026-09-27",
+  "scope": "isolated restricted deployment",
+  "gatewayRegressionTestsPassed": 12,
+  "publicEnrollmentEnabled": false,
+  "ingressHealthHTTP": 200,
+  "ingressEnrollmentHTTP": 404,
+  "nativePlaybackTested": false,
+  "published": false
+}

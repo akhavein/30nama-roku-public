@@ -27,10 +27,20 @@
 - Entered the hosted policy/support URLs and selected sign-in **Yes** in the publisher form, but the form is **unsaved**: required administrative and technical phone numbers are missing. A dedicated paid subscriber reviewer login is also unavailable; no household credentials were disclosed to reviewers.
 - Roku's overview still disables **Schedule publishing** and marks App profile and App Behavior Analysis incomplete. The uploaded analysis-only package was not replaced or submitted. The shared reverse proxy cannot reload because an existing private-network listener address is absent; its running configuration and networking were left unchanged. The app service is still restricted, not publicly available.
 
+## Contact, authentication and ingress follow-up on 2026-09-27
+
+- Saved the completed app profile, including publisher-supplied administrative/technical phone numbers. Confirmed the profile completion indicator in the overview. Contact values are intentionally excluded from this repository.
+- The account owner explicitly authorized using their own subscriber account for review. Saved it in Roku's Test Credentials page; no credentials were written to this repository. The earlier separate-reviewer-account request is no longer the blocker.
+- Found a concrete authentication mismatch: the uploaded application supports email OTP, not password login. The provider website's `loginV2` API returned a CAPTCHA-parameter error to direct password authentication; its older `login/` route returned an update-required response. These responses do **not** establish whether the supplied password is valid. No CAPTCHA bypass, alternative fabricated login, or test-only entitlement was implemented.
+- Corrected the reviewer credential description to explicitly flag the OTP-only analysis build. Roku's App Behavior Analysis requires uploaded, working RASP sign-in and sign-out scripts. No fake scripts were uploaded and no behavior pass is claimed. See [Roku authenticated-app testing](https://developer.roku.com/dev/docs/authenticated-cert-testing).
+- Established a dedicated Cloudflare Tunnel on the existing isolated deployment without modifying the shared reverse proxy, Tailscale, or household helper. HTTPS health returns 200; public enrollment and all authenticated routes remain closed at the tunnel. This is **restricted ingress readiness**, not public-service acceptance. Policy hosting was updated to disclose Cloudflare's role.
+- Added container restart policies and gateway/browser-backed helper health checks; enabled the isolated browser and tunnel at boot. Six live restart checks passed, including old-credential invalidation, re-enrollment, fresh subtitle delivery after browser/container restart, and revocation. A first probe attempted subtitles before browser readiness and returned 503; the final acceptance waits for the browser-backed helper readiness check. No native automatic-renewal claim follows from a script manually re-enrolling.
+- Re-ran the 12 gateway regression tests successfully. Evidence: `GATEWAY-RESTART-2026-09-27.json`. One real provider account only; no TV install or playback/history change in this follow-up.
+
 ## Not yet completed / must not be reported as passed
 
 - Gateway production endpoint/deployment, live multi-account provider validation, provider/browser compatibility with cookie omission, measured public load and monitoring. Protective caps are not capacity proof.
-- Final administrative/technical contacts, saving the completed app profile, dedicated reviewer credentials and the app's reviewed existing-subscriber classification. Policy hosting is complete as recorded above. The app is not monetized by this publisher; its saved listing explicitly discloses the provider's paid-account requirement. No claim of free subscription content is made.
+- Working provider-supported automated authentication and verified RASP sign-in/sign-out scripts, plus the app's reviewed existing-subscriber classification. Profile contacts, owner-authorized reviewer credentials and policy hosting are saved as recorded above. The app is not monetized by this publisher; its saved listing explicitly discloses the provider's paid-account requirement. No claim of free subscription content is made.
 - Remaining native checks beyond the 14 deep-link cases above. Existing private precursor results do not cover the Store candidate's other changes.
 - Full catalog trick-play coverage: the current worker supports only its documented HLS subset. Unsupported streams still fall back to time-only seeking. This is not a blanket certification exception.
 - Full custom-caption font/edge/window styling and native/custom-track interaction, screen-reader and audio-description checks. The implemented subset is not an accessibility certification claim.
@@ -40,7 +50,7 @@
 ## Inputs/actions needed to finish
 
 - Worldwide selection is now saved. Finalize support/policies with actual deployment facts; do not turn the analysis-only upload into a release candidate until operational gates pass.
-- Provide dedicated reviewer access and a second authorized live provider account. Do not disclose household account credentials as reviewer credentials.
+- Resolve OTP/password/CAPTCHA compatibility for Roku automated authentication. Owner-authorized reviewer credentials are already saved; do not ask for the same phone or credentials again. A second authorized live provider account is still needed for the distinct-account acceptance gate.
 - Additional required hardware or Roku testing access remains necessary; full approval allowed testing on the idle household TCL in this session.
 - Verify provider-supported preview formats/source coverage, and complete native caption work before a public certification claim.
 
