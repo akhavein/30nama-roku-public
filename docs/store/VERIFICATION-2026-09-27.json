@@ -140,7 +140,8 @@
     "listingAssetsSaved": true,
     "signedAnalysisCandidateUploaded": true,
     "publicationSubmitted": false,
-    "published": false
+    "published": false,
+    "deepLinkExamplesSaved": 2
   },
   "rsg13": {
     "build": 2,
@@ -148,7 +149,7 @@
     "nativeDeepLinksPassed": 14,
     "nativeDeepLinksTotal": 14,
     "minimumFirmware": "15.1.0 b1",
-    "staticAnalysis": "repeat pending",
+    "staticAnalysis": "done",
     "previousStaticErrors": 0,
     "previousStaticWarnings": 8,
     "fixedWarnings": [
@@ -162,6 +163,9 @@
       "GetMemoryLimitPercent",
       "EnableLowGeneralMemoryEvent",
       "GetChannelMemoryLimit"
-    ]
+    ],
+    "staticErrors": 0,
+    "staticWarnings": 5,
+    "staticInfo": 1
   }
 }
