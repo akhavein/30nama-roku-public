@@ -43,6 +43,10 @@ sub executeRequest()
         req.AddHeader("Content-Type","application/json")
         body = FormatJson({apiKey:m.top.apiKey,token:m.top.token,progress:payload})
     end if
+    if Len(body) > 16384 then
+        m.top.result = {success:false,error:"request_too_large"}
+        return
+    end if
     attempts = 1
     timeout = 15000
     if m.top.tag = "search" or m.top.tag = "catalog" or m.top.tag = "detail" or m.top.tag = "stream" or m.top.tag = "next-prefetch" then attempts = 2: timeout = 6000
@@ -52,18 +56,30 @@ sub executeRequest()
         raw = invalid
         m.top.httpStatus = 0
         started = false
+        headers = invalid
         if m.top.tag = "helper-health" then started = req.AsyncGetToString() else started = req.AsyncPostFromString(body)
         if not started then exit for
         event = Wait(timeout, port)
         if event <> invalid then
             m.top.httpStatus = event.GetResponseCode()
             raw = event.GetString()
-            if m.top.httpStatus >= 200 and m.top.httpStatus < 500 then exit for
+            headers = event.GetResponseHeadersArray()
+            ' Cap parsing/retained JSON. roUrlTransfer still allocates the
+            ' completed response before this check; this is not a wire-byte cap.
+            if ApiResponseTooLarge(m.top.tag,raw) then
+                m.top.elapsedMs = timer.TotalMilliseconds()
+                m.top.result = {success:false,error:"response_too_large"}
+                return
+            end if
         end if
         req.AsyncCancel()
         ' Cancelled transfer's port is drained before the bounded retry.
         while port.GetMessage() <> invalid
         end while
+        if attempt >= attempts or not ApiMayRetry(m.top.tag,m.top.httpStatus) then exit for
+        delayMs = ApiRetryDelay(headers)
+        if delayMs < 0 then exit for
+        Sleep(delayMs)
     end for
     m.top.elapsedMs = timer.TotalMilliseconds()
     if raw = invalid then
@@ -79,7 +95,6 @@ sub executeRequest()
         m.top.result = {success:false, error:"http_status", status:raw}
         return
     end if
-    if m.top.httpStatus = 0 then m.top.httpStatus = 200
     if m.top.httpStatus < 200 or m.top.httpStatus >= 300 then
         print "[30nama][api] end id="; m.top.requestId; " status="; m.top.httpStatus; " elapsed_ms="; m.top.elapsedMs
         m.top.result = {success:false, error:"http_status", status:m.top.httpStatus}

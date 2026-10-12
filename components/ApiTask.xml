@@ -22,4 +22,5 @@
     <field id="elapsedMs" type="integer" />
   </interface>
   <script type="text/brightscript" uri="pkg:/components/ApiTask.brs" />
+  <script type="text/brightscript" uri="pkg:/components/ApiPolicy.brs" />
 </component>

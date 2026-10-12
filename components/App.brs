@@ -78,6 +78,7 @@ sub init()
     m.page = "home"
     m.generation = 0
     m.tasks = {}
+    InitApiScheduler()
     m.requestCounter = 0
     m.keyboardCounter = 0
     m.catalog = []
@@ -198,6 +199,7 @@ end sub
 sub CancelRequest(tag as String)
     task = m.tasks.Lookup(tag)
     if task = invalid then return
+    ReleaseApiRequest(tag,Text(task.requestId))
     task.unobserveField("result")
     task.control = "stop"
     m.top.removeChild(task)
@@ -226,7 +228,7 @@ sub Request(tag as String, action as String, payload as Object)
     task.observeField("result", "OnApiResult")
     m.tasks[tag] = task
     m.top.appendChild(task)
-    task.control = "run"
+    EnqueueApiRequest(task)
 end sub
 
 sub OnApiResult(event as Object)
@@ -235,6 +237,7 @@ sub OnApiResult(event as Object)
     activeTask = m.tasks.Lookup(tag)
     if activeTask = invalid then return
     if activeTask.requestId <> task.requestId then return
+    ReleaseApiRequest(tag,Text(task.requestId))
     result = task.result
     validPage = tag = "catalog" or tag = "progress" or tag = "profile" or tag = "remote-history" or CloudGlobalTag(tag) or task.generation = m.generation
     m.tasks.Delete(tag)
