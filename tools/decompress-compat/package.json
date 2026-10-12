@@ -1,0 +1,9 @@
+{
+  "name": "@30nama/decompress-compat",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.cjs",
+  "dependencies": {
+    "@xhmikosr/decompress": "11.1.4"
+  }
+}
