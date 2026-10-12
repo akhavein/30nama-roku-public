@@ -1,6 +1,7 @@
 sub ShowHome()
     EnterPage("home", "Home")
     RenderHome(true)
+    if m.catalog.Count() = 0 then Request("catalog","mainV2",{})
 end sub
 
 sub RenderHome(focus as Boolean)

@@ -89,7 +89,14 @@ sub OnEasyLoginTick()
     seconds = Text(remaining mod 60)
     if Len(seconds) = 1 then seconds = "0" + seconds
     m.easyCountdown.text = "Time left: " + Text(Int(remaining / 60)) + ":" + seconds
-    if m.easyState.phase <> "waiting" or elapsed < m.easyState.nextPollMs then return
+    if elapsed < m.easyState.nextPollMs then return
+    if m.easyState.phase = "verify-wait" then
+        if m.tasks.DoesExist("easy-verify") then return
+        m.easyState.phase = "verifying"
+        Request("easy-verify","user",{})
+        return
+    end if
+    if m.easyState.phase <> "waiting" then return
     if m.tasks.DoesExist("easy-poll") then return
     m.easyState.nextPollMs = elapsed + 5000
     Request("easy-poll","qrlogin/code/" + m.easyState.code,{})
@@ -104,40 +111,62 @@ sub HandleEasyLogin(tag as String, result as Dynamic, httpStatus as Integer)
     if tag = "easy-code" then
         if m.easyState.phase <> "creating" then return
         code = EasyLoginCode(result)
-        if code = "" then
+        if code = "" or httpStatus < 200 or httpStatus >= 300 then
             EasyLoginFailure("Couldn't create a code. Check your connection and try again.")
             return
         end if
         m.easyState.code = code
         m.easyState.phase = "waiting"
+        m.easyState.nextPollMs = m.easyClock.TotalMilliseconds() + 5000
         m.easyCode.text = code
         m.status.text = "Scan the QR code, sign in on your phone, and approve this TV."
         StartEasyQr(code)
     else if tag = "easy-poll" then
         if m.easyState.phase <> "waiting" then return
         token = EasyLoginToken(result)
-        if token <> "" then
+        if token <> "" and httpStatus >= 200 and httpStatus < 300 then
             m.easyCandidate = token
+            m.easyState.verifyFailures = 0
             m.easyState.phase = "verifying"
             m.status.text = "Approved. Verifying your account..."
             Request("easy-verify","user",{})
-        else if httpStatus = 401 or httpStatus = 403 or httpStatus = 404 or httpStatus = 410 then
+        else if httpStatus = 403 then
+            EasyLoginFailure("Sign-in service denied the request. Try again later; your existing account is unchanged.")
+        else if httpStatus = 401 or httpStatus = 404 or httpStatus = 410 then
             EasyLoginFailure("This code is no longer available. Get a new code.")
-        else if httpStatus = 0 or httpStatus = 429 or httpStatus >= 500 then
+        else if httpStatus <= 0 or httpStatus = 429 or httpStatus >= 500 then
             m.easyState.failures = m.easyState.failures + 1
             delay = 5000 * (m.easyState.failures + 1)
             if delay > 30000 then delay = 30000
             m.easyState.nextPollMs = m.easyClock.TotalMilliseconds() + delay
             m.status.text = "Connection interrupted. Retrying until this code expires..."
         else
+            if httpStatus < 200 or httpStatus >= 300 or not IsMap(result) then
+                EasyLoginFailure("Couldn't read the sign-in response. Get a new code to try again.")
+                return
+            end if
+            if Truth(result.success) or Text(result.error) = "invalid_json" then
+                EasyLoginFailure("Couldn't read the sign-in response. Get a new code to try again.")
+                return
+            end if
             ' Provider returns success:false while waiting for approval; not a login failure.
             m.easyState.failures = 0
+            m.easyState.nextPollMs = m.easyClock.TotalMilliseconds() + 5000
             m.status.text = "Waiting for approval on your phone..."
         end if
     else if tag = "easy-verify" then
         if m.easyState.phase <> "verifying" then return
+        if httpStatus <= 0 or httpStatus = 429 or httpStatus >= 500 then
+            m.easyState.verifyFailures = SafeInt(m.easyState.verifyFailures) + 1
+            if m.easyState.verifyFailures <= 3 then
+                m.easyState.phase = "verify-wait"
+                m.easyState.nextPollMs = m.easyClock.TotalMilliseconds() + 5000 * m.easyState.verifyFailures
+                m.status.text = "Approved. Connection interrupted; retrying account verification..."
+                return
+            end if
+        end if
         valid = false
-        if IsMap(result) then
+        if IsMap(result) and httpStatus >= 200 and httpStatus < 300 then
             if Truth(result.success) and IsMap(result.result) then valid = SafeInt(result.result.userid) > 0
         end if
         if not valid then

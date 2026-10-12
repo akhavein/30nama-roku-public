@@ -10,6 +10,10 @@ Account → Sign in opens the QR/code screen. Scan it and approve on the officia
 
 Polling occurs no faster than every five seconds, with one in-flight request and bounded network backoff. The TV stops after five minutes, on cancellation, navigation, session invalidation, or provider expiry. Get a new code starts a fresh request generation. Untrusted activation origins, mismatched URLs/codes, malformed responses and unverified tokens are rejected. Codes, URL payloads and tokens are not printed to the API log. Temporary QR PNGs are deleted when the flow ends. Passwords are never collected.
 
+The five-second interval starts after code creation or a pending response completes. Native transport errors and HTTP 429/5xx back off. After approval, transient profile-verification failures retain the candidate only in memory and retry the read up to three times (5/10/15 seconds), inside the same five-minute deadline. Cancellation clears that candidate. Rejected or malformed verification cannot replace the active account. HTTP 403 stops with a service-denial message; it is not treated as proof that the code expired or as permission to bypass a challenge.
+
+Provider HTTP 401 and an HTTP 200 failure envelope with the explicit `login required` message invalidate the existing provider session. Other network, rate-limit, challenge and subscription failures do not erase it. Session changes discard personalized catalog/search snapshots and signed next-episode/caption prefetch state. Account-bound local viewing data is still cleared only on explicit sign-out/clear or a verified owner change; session persistence across updates is unchanged.
+
 The bundled QR library's SceneGraph enum objects were converted to pure value objects. Alignment-pattern corner exclusions were rewritten as explicit conditions after independent matrix tests found incorrect output with the upstream expression; array splice append/tail handling was also corrected. QR encoding is limited to versions 1–6, medium ECC and mask 0 in a background Task.
 
 ## Verification

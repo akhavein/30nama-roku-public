@@ -244,7 +244,8 @@ sub OnApiResult(event as Object)
     m.stats.requests = m.stats.requests + 1
     ok = IsMap(result) and Truth(result.success)
     if not ok and tag <> "easy-poll" then m.stats.failures = m.stats.failures + 1
-    if task.httpStatus = 401 and tag <> "helper-health" and tag <> "progress" and tag <> "login" and Left(tag,5) <> "easy-" then
+    sessionExpired = ProviderSessionExpired(tag,result,task.httpStatus)
+    if sessionExpired then
         InvalidateSessionRequests()
         m.api.token = ""
         m.syncToken = ""
@@ -253,7 +254,7 @@ sub OnApiResult(event as Object)
         m.registry.Flush()
     end if
     if (tag = "progress" or tag = "helper-health") and task.httpStatus = 401 then RefreshManagedSession()
-    if task.httpStatus = 401 and IsMap(m.pendingStoreLink) and tag <> "progress" and tag <> "helper-health" and tag <> "login" and Left(tag,5) <> "easy-" then
+    if sessionExpired and IsMap(m.pendingStoreLink) then
         OnStoreLink()
         return
     end if
@@ -315,6 +316,10 @@ sub OnApiResult(event as Object)
         RefreshCaptionMetadata(result)
     else if tag = "login" then
         HandleLogin(result, task.action)
+    end if
+    if sessionExpired then
+        if m.page = "account" then ShowAccount()
+        m.status.text = "Your session has expired. Sign in from Account."
     end if
     if m.page = "diagnostics" then RenderDiagnostics()
 end sub

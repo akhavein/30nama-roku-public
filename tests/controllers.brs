@@ -25,6 +25,7 @@ sub Main()
     m.generation = 5
     m.api = {token:"fixture"}
     m.stats = {requests:0,failures:0}
+    m.status = {}
     OnApiResult(event)
     Assert(m.tasks.stream.requestId = "active", "old callback cannot remove new request")
     Assert(m.top.removed = 0, "old callback leaves active node attached")
@@ -42,6 +43,16 @@ sub Main()
     Assert(m.api.token = "fixture" and m.stats.requests = 0,"old-account response cannot invalidate a replacement login")
     m.userId = 123
     m.syncToken = "old-observer-token"
+    m.nextPrefetch = {episode:{id:99},saved:1}
+    m.incomingCaption = {cues:[{text:"old account"}]}
+    m.catalog = [{label:"old account recommendations"}]
+    m.railItems = [[{id:99}]]
+    m.searchItems = [{id:99}]
+    m.searchSnapshot = {query:"old account search"}
+    m.tasks.catalog = {unobserveField:sub(name)
+    end sub}
+    m.tasks["caption-prefetch"] = {unobserveField:sub(name)
+    end sub}
     task = {requestId:"401",tag:"fixture",generation:5,httpStatus:401,result:{success:false}}
     m.tasks.fixture = task
     event.node = task
@@ -50,6 +61,9 @@ sub Main()
     Assert(m.api.token = "", "active 401 clears session memory")
     Assert(m.registry.Read("session_token") = invalid, "active 401 clears session registry")
     Assert(m.userId = 0 and m.syncToken = "","session invalidation clears observer identity as well as login")
+    Assert(m.nextPrefetch = invalid and m.incomingCaption = invalid and not m.tasks.DoesExist("caption-prefetch"),"session invalidation removes signed next-episode and caption prefetch state")
+    Assert(m.catalog.Count() = 0 and m.railItems.Count() = 0 and not m.tasks.DoesExist("catalog"),"session invalidation removes personalized catalog and cancels its old request")
+    Assert(m.searchItems.Count() = 0 and m.searchSnapshot = invalid,"account switch cannot restore old search snapshot")
     Assert(m.stats.failures = 1, "active failure counted once")
     OnApiResult(event)
     Assert(m.stats.failures = 1, "duplicate result ignored")
@@ -58,6 +72,15 @@ sub Main()
     event.node = task
     OnApiResult(event)
     Assert(m.stats.failures = 2, "malformed success flag fails without runtime type error")
+    m.api.token = "expired-envelope-token"
+    m.registry.Write("session_token",m.api.token)
+    m.page = "account"
+    task = {requestId:"expired-envelope",tag:"fixture",generation:5,httpStatus:200,result:{success:false,msg:"Login required"}}
+    m.tasks.fixture = task
+    event.node = task
+    OnApiResult(event)
+    Assert(m.api.token = "" and m.registry.Read("session_token") = invalid,"HTTP 200 login-required envelope clears the rejected session")
+    Assert(m.status.text = "Your session has expired. Sign in from Account.","expired session provides an actionable account message")
     m.tasks.catalog = {control:"run",unobserveField:sub(name)
     end sub}
     m.tasks.detail = {control:"run",unobserveField:sub(name)

@@ -141,7 +141,13 @@ sub InvalidateSessionRequests()
     m.syncMedia = invalid
     m.lastSyncPosition = -1
     m.progressFailures = 0
-    for each tag in ["profile","remote-history","progress","next-prefetch","stream","detail","search","cloud-list","cloud-membership","cloud-check","cloud-write","cloud-verify"]
+    m.catalog = []
+    m.railItems = []
+    m.searchItems = []
+    m.searchSnapshot = invalid
+    m.nextPrefetch = invalid
+    m.incomingCaption = invalid
+    for each tag in ["catalog","profile","remote-history","progress","next-prefetch","caption-prefetch","subtitle-refresh","stream","detail","search","cloud-list","cloud-membership","cloud-check","cloud-write","cloud-verify"]
         CancelRequest(tag)
     end for
     m.progressQueue = []

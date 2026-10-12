@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-12",
+  "baseline": "ba8333faa60084509c60a33e9334cc7731982543",
+  "branch": "codex/android-auth-reliability",
+  "command": "npm run package",
+  "result": "passed",
+  "brightscript_assertions": 527,
+  "brightscript_groups": 19,
+  "independent_qr_matrix_fixtures": 2,
+  "helper_gateway_tests": 18,
+  "preview_tests": 11,
+  "recorder": "passed",
+  "compiler": "passed",
+  "xml_artwork": "passed",
+  "zip_integrity": "passed",
+  "zip_sha256": "06036b70a9a91e10bd40182e3386c18104426b00d666cef86d57c2f65dd84e23",
+  "fixtures": "synthetic; loopback only",
+  "initial_sandbox_failure": "EPERM binding 127.0.0.1; approved loopback test run passed",
+  "native_device_tested": false,
+  "live_provider_tested": false,
+  "deployment_or_push": false,
+  "provider_configuration": "placeholder; not a release package",
+  "dev_dependency_advisories": {
+    "critical": 1,
+    "high": 7,
+    "moderate": 3
+  },
+  "notes": [
+    "No registry schema or credential configuration changes.",
+    "Existing local source checkouts were clean and left unchanged.",
+    "Device QR scanning, relaunch/update continuity and physical AV remain acceptance gates."
+  ]
+}

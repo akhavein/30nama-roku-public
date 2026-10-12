@@ -67,6 +67,17 @@ function IsNumericValue(value as Dynamic) as Boolean
     return type(value) = "Integer" or type(value) = "roInt" or type(value) = "Float" or type(value) = "roFloat" or type(value) = "Double" or type(value) = "roDouble" or type(value) = "LongInteger"
 end function
 
+' Only provider session evidence can expire an account. Challenges, transport
+' errors, subscription denial and helper credentials are separate failures.
+function ProviderSessionExpired(tag as String, result as Dynamic, status as Integer) as Boolean
+    if tag = "helper-health" or tag = "progress" or tag = "login" or Left(tag,5) = "easy-" then return false
+    if status = 401 then return true
+    if status <> 200 or not IsMap(result) then return false
+    if Truth(result.success) then return false
+    message = LCase(Text(result.msg).Trim())
+    return message = "login required" or message = "login required." or message = "login required!"
+end function
+
 function Text(value as Dynamic, fallback = "" as String) as String
     if value = invalid then return fallback
     if GetInterface(value, "ifString") <> invalid then return value

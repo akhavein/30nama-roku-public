@@ -1,5 +1,15 @@
 sub Main()
     m.checks = 0
+    Assert(ProviderSessionExpired("profile",{success:false,msg:" LOGIN REQUIRED! "},200),"provider login-required envelope expires session")
+    Assert(not ProviderSessionExpired("profile",{success:true,msg:"login required"},200),"successful envelope cannot expire session")
+    for each tag in ["easy-code","easy-poll","easy-verify","login","progress","helper-health"]
+        Assert(not ProviderSessionExpired(tag,{success:false,msg:"login required"},401),"candidate and helper failures cannot expire active provider account")
+    end for
+    for each status in [0,-28,403,429,500,503]
+        Assert(not ProviderSessionExpired("profile",{success:false,msg:"login required"},status),"transport/challenge/rate failures do not erase session")
+    end for
+    Assert(not ProviderSessionExpired("profile",{success:false,msg:"subscription required"},200),"entitlement failure is distinct from login")
+    Assert(not ProviderSessionExpired("profile",invalid,200),"malformed profile does not erase session")
     Assert(Text(invalid) = "", "missing text")
     Assert(SafeInt("bad") = 0, "invalid number")
     Assert(Truth(1) and Truth(true) and Truth("true") and not Truth("false"), "API boolean variants")

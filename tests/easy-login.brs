@@ -69,6 +69,63 @@ sub Main()
     m.easyClock.elapsed = 300001
     OnEasyLoginTick()
     Assert(m.easyTimer.control = "stop" and m.easyState = invalid,"deadline stops all login work without a response")
+    Reset()
+    m.easyClock.elapsed = 14000
+    HandleEasyLogin("easy-code",{success:true,result:{code:"Ab12_cd9",url:"https://30nama.com/auth/Ab12_cd9"}},200)
+    OnEasyLoginTick()
+    Assert(m.calls.Count() = 0 and m.easyState.nextPollMs = 19000,"slow code creation still waits five seconds before polling")
+    m.easyClock.elapsed = 25000
+    HandleEasyLogin("easy-poll",{success:false},200)
+    Assert(m.easyState.nextPollMs = 30000,"slow pending responses cannot cause back-to-back polls")
+    HandleEasyLogin("easy-poll",{success:false},-28)
+    Assert(m.easyState.nextPollMs = 35000,"native transport errors back off instead of appearing pending")
+    Reset()
+    m.easyState.phase = "waiting"
+    HandleEasyLogin("easy-poll",{success:true,result:{}},200)
+    Assert(m.easyState = invalid and m.api.token = "previous","malformed approval fails explicitly and preserves old account")
+    Reset()
+    m.easyState.phase = "waiting"
+    HandleEasyLogin("easy-poll",{success:false,error:"invalid_json"},200)
+    Assert(m.easyState = invalid,"invalid JSON is not reported as phone approval pending")
+    Reset()
+    m.easyState.phase = "waiting"
+    HandleEasyLogin("easy-poll",{success:false},403)
+    Assert(m.easyState = invalid and m.api.token = "previous" and Instr(1,m.status.text,"denied") > 0,"service denial is distinct from an expired code and never bypassed")
+    Reset()
+    m.easyState.phase = "verifying": m.easyCandidate = "candidate"
+    HandleEasyLogin("easy-verify",{success:false},503)
+    Assert(m.easyState.phase = "verify-wait" and m.easyCandidate = "candidate" and m.registry.writes = 0,"transient verification preserves candidate without saving it")
+    m.easyClock.elapsed = 4999
+    OnEasyLoginTick()
+    Assert(m.calls.Count() = 0,"verification backoff does not busy loop")
+    m.easyClock.elapsed = 5000
+    OnEasyLoginTick()
+    OnEasyLoginTick()
+    Assert(m.calls.Count() = 1 and m.calls[0].tag = "easy-verify","verification retry is a single profile read, not another approval poll")
+    m.tasks.Delete("easy-verify")
+    HandleEasyLogin("easy-verify",{success:true,result:{userid:42}},200)
+    Assert(m.api.token = "candidate" and m.resumed,"recovered verification commits the approved session")
+    Reset()
+    m.easyCandidate = "candidate"
+    for n = 1 to 4
+        m.easyState.phase = "verifying"
+        HandleEasyLogin("easy-verify",{success:false},429)
+    end for
+    Assert(m.easyState = invalid and m.easyCandidate = "" and m.api.token = "previous","verification retries stop after three retries without replacing account")
+    Reset()
+    m.easyState.phase = "verifying": m.easyCandidate = "candidate"
+    HandleEasyLogin("easy-verify",{success:true,result:{userid:42}},401)
+    Assert(m.easyState = invalid and m.registry.writes = 0,"rejected transport status cannot authenticate even with a success-shaped body")
+    Reset()
+    m.easyState.phase = "verifying": m.easyCandidate = "candidate"
+    HandleEasyLogin("easy-verify",{success:false},503)
+    m.easyButtons.itemSelected = 1
+    OnEasyLoginButton()
+    m.easyClock = {TotalMilliseconds:function()
+        return 5000
+    end function}
+    OnEasyLoginTick()
+    Assert(m.calls.Count() = 0 and m.easyCandidate = "","cancel during verification backoff never retries or retains candidate")
     print "REGRESSION PASS: ";m.checks;" Easy Login assertions"
 end sub
 sub Reset()
