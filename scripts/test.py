@@ -16,6 +16,8 @@ subtitle_controller = '\n'.join(re.search(r'(?mi)^(sub|function) '+name+r'\(.*?^
 buffer_controller = re.search(r'(?mi)^sub OnBufferTimeout\(.*?^end sub\s*$',all_source,re.S).group()
 search_names = ['StartSearch','SearchCacheGet','CacheSearch','HandleSearchResult','CommitSearch','RememberSearchFocus','RestoreSearchSnapshot','CancelSearchEdit']
 search_controller = '\n'.join(re.search(r'(?mi)^(sub|function) '+name+r'\(.*?^end \1\s*$',all_source,re.S).group() for name in search_names)
+browse_source = (root/'components/Browse.brs').read_text()
+home_controller = '\n'.join(re.search(r'(?mi)^(sub|function) '+name+r'\(.*?^end \1\s*$',browse_source,re.S).group() for name in ['ShowHome','RenderHome','HandleCatalog'])
 scheduler = (root/'components/ApiScheduler.brs').read_text()
 policy = (root/'components/ApiPolicy.brs').read_text()
 transport = (root/'components/ApiTask.brs').read_text()
@@ -24,11 +26,11 @@ for original, fake in [('CreateObject("roUrlTransfer")','FakeTransfer()'),('Crea
     assert original in transport
     transport = transport.replace(original, fake)
 easy_controller = re.sub(r'(?mis)^sub StartEasyQr\(.*?^end sub\s*$', '', (root/'components/EasyLogin.brs').read_text())
-for filename, source in [('api-task.brs',policy+'\n'+transport),('api-policy.brs',policy),('api-scheduler.brs',model+'\n'+scheduler+'\n'+controller[names.index('CancelRequest')]),('easy-login.brs',model+'\n'+easy_controller),('service-client.brs',model),('store-controller.brs',model),('store-model.brs',model),('previews.brs',model+'\n'+(root/'components/Previews.brs').read_text()),('cloud-watchlist.brs',model+'\n'+(root/'components/CloudWatchlist.brs').read_text()),('intro.brs',model+'\n'+(root/'components/Intro.brs').read_text()),('watching-controller.brs',model+'\n'+(root/'components/Experience.brs').read_text()),('watching.brs',model),('reliability.brs',model+'\n'+(root/'components/Reliability.brs').read_text()),('search.brs',model+'\n'+search_controller),('sync-controller.brs',model+'\n'+(root/'components/Sync.brs').read_text()),('features.brs',model+'\n'+(root/'components/Captions.brs').read_text()),('sync.brs',model),('buffer-controller.brs',buffer_controller),('subtitle-controller.brs',model+'\n'+(root/'components/Captions.brs').read_text()+'\n'+subtitle_controller),('logic.brs',model),('controllers.brs',model+'\n'+scheduler+'\n'+'\n'.join(controller)),('captions.brs',(root/'components/Captions.brs').read_text())]:
+for filename, source in [('home.brs',model+'\n'+home_controller),('api-task.brs',policy+'\n'+transport),('api-policy.brs',policy),('api-scheduler.brs',model+'\n'+scheduler+'\n'+controller[names.index('CancelRequest')]),('easy-login.brs',model+'\n'+easy_controller),('service-client.brs',model),('store-controller.brs',model),('store-model.brs',model),('previews.brs',model+'\n'+(root/'components/Previews.brs').read_text()),('cloud-watchlist.brs',model+'\n'+(root/'components/CloudWatchlist.brs').read_text()),('intro.brs',model+'\n'+(root/'components/Intro.brs').read_text()),('watching-controller.brs',model+'\n'+(root/'components/Experience.brs').read_text()),('watching.brs',model),('reliability.brs',model+'\n'+(root/'components/Reliability.brs').read_text()),('search.brs',model+'\n'+search_controller),('sync-controller.brs',model+'\n'+(root/'components/Sync.brs').read_text()),('features.brs',model+'\n'+(root/'components/Captions.brs').read_text()),('sync.brs',model),('buffer-controller.brs',buffer_controller),('subtitle-controller.brs',model+'\n'+(root/'components/Captions.brs').read_text()+'\n'+subtitle_controller),('logic.brs',model),('controllers.brs',model+'\n'+scheduler+'\n'+'\n'.join(controller)),('captions.brs',(root/'components/Captions.brs').read_text())]:
     # brs scans its working directory; never give it the shared system /tmp.
     with tempfile.TemporaryDirectory(prefix='roku-brs-') as test_dir:
         script=pathlib.Path(test_dir)/filename
-        script.write_text(source+'\n'+('' if filename == 'easy-login.brs' else platform)+'\n'+(root/'tests'/filename).read_text())
+        script.write_text(source+'\n'+('' if filename in ['easy-login.brs','home.brs'] else platform)+'\n'+(root/'tests'/filename).read_text())
         result=subprocess.run([str(root/'node_modules/.bin/brs'),str(script)],cwd=test_dir,capture_output=True,text=True)
         print(result.stdout,end='')
         if result.stderr:print(result.stderr,end='')

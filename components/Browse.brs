@@ -1,7 +1,18 @@
 sub ShowHome()
     EnterPage("home", "Home")
+    if m.catalog.Count() = 0 and m.catalogState <> "ready" then Request("catalog","mainV2",{})
     RenderHome(true)
-    if m.catalog.Count() = 0 then Request("catalog","mainV2",{})
+end sub
+
+sub HandleCatalog(result as Dynamic)
+    m.catalogState = "error"
+    if IsMap(result) and Truth(result.success) and IsMap(result.result) then
+        data = result.result
+        m.catalog = [{label:"Featured",items:SectionPosts(data.hero_section)},{label:"Suggested",items:SectionPosts(data.suggested)},{label:"Top 10",items:SectionPosts(data.top10)}]
+        m.catalogState = "ready"
+    end if
+    if m.page = "home" then RenderHome(false)
+    QueueStoreRendered()
 end sub
 
 sub RenderHome(focus as Boolean)
@@ -13,11 +24,20 @@ sub RenderHome(focus as Boolean)
     end for
     m.status.text = "Find your next watch"
     if groups.Count() = 0 then
-        m.status.text = "Loading your library..."
-        ShowEmpty("Your movies and series will appear here.")
+        if m.catalogState = "ready" then
+            m.status.text = "No titles available"
+            ShowEmpty("The catalog is empty. You can refresh it from Account.")
+        else if m.catalogState = "error" then
+            m.status.text = "Catalog unavailable"
+            ShowEmpty("Check your connection, then open Account and choose Refresh catalog.")
+        else
+            m.status.text = "Loading your library..."
+            ShowEmpty("Your movies and series will appear here.")
+        end if
         m.nav.setFocus(true)
     else
         RenderRails(groups, focus)
+        if m.catalogState = "error" then m.status.text = "Showing saved titles. Open Account to retry the catalog."
     end if
 end sub
 

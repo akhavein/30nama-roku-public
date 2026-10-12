@@ -142,6 +142,7 @@ sub InvalidateSessionRequests()
     m.lastSyncPosition = -1
     m.progressFailures = 0
     m.catalog = []
+    m.catalogState = "idle"
     m.railItems = []
     m.searchItems = []
     m.searchSnapshot = invalid

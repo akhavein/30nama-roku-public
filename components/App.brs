@@ -82,6 +82,7 @@ sub init()
     m.requestCounter = 0
     m.keyboardCounter = 0
     m.catalog = []
+    m.catalogState = "idle"
     m.railItems = []
     m.allEpisodes = []
     m.episode = invalid
@@ -208,6 +209,7 @@ end sub
 
 sub Request(tag as String, action as String, payload as Object)
     if m.tasks.DoesExist(tag) then return
+    if tag = "catalog" then m.catalogState = "loading"
     m.requestCounter = m.requestCounter + 1
     task = CreateObject("roSGNode", "ApiTask")
     task.helperUrl = m.helperUrl
@@ -288,14 +290,7 @@ sub OnApiResult(event as Object)
     else if tag = "progress" then
         HandleProgress(task,ok)
     else if tag = "catalog" then
-        if ok and IsMap(result.result) then
-            data = result.result
-            m.catalog = [{label:"Featured", items:SectionPosts(data.hero_section)}, {label:"Suggested", items:SectionPosts(data.suggested)}, {label:"Top 10", items:SectionPosts(data.top10)}]
-            if m.page = "home" then RenderHome(false)
-        else if m.page = "home" then
-            m.status.text = "Couldn't load the catalog. Open Account to refresh."
-        end if
-        QueueStoreRendered()
+        HandleCatalog(result)
     else if tag = "detail" then
         if ok and IsMap(result.result) then
             info = NormalizeTitle(result.result)

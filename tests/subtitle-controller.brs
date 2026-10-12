@@ -58,6 +58,10 @@ sub Main()
     m.episode = {id:12}
     RefreshCaptionMetadata({success:true,result:{list:{"1":[{data:{id:11,season:1,number:1},subtitle:{fa:"https://subtitle.30nama.com/wrong.srt"}},{data:{id:12,season:1,number:2},subtitle:{fa:"https://subtitle.30nama.com/right.srt"}}]}}})
     Assert(SidecarUrl("fa") = "https://subtitle.30nama.com/right.srt", "series refresh selects exact current episode")
+    m.loadedCode = "unchanged"
+    RefreshCaptionMetadata({success:true,result:{subtitle:{fa:"https://subtitle.30nama.com/parent-wrong.srt"},list:{"1":[{data:{id:11,season:1,number:1},subtitle:{fa:"https://subtitle.30nama.com/wrong.srt"}}]}}})
+    Assert(m.loadedCode = "unchanged" and SidecarUrl("fa") = "https://subtitle.30nama.com/right.srt","missing current episode cannot replace subtitles with parent or other-episode metadata")
+    Assert(Instr(1,m.captionNotice.text,"this episode") > 0,"missing-episode refresh gives an actionable error")
     RefreshCaptionMetadata({success:false})
     Assert(Instr(1,m.captionNotice.text,"refresh") > 0, "failed refresh gives recoverable message")
     m.customCaptionEnabled = false

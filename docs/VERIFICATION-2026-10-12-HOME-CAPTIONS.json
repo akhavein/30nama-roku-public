@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-12",
+  "baseline": "22dd33a",
+  "command": "npm run package",
+  "result": "passed",
+  "brightscript_assertions": 618,
+  "brightscript_groups": 23,
+  "independent_qr_fixtures": 2,
+  "node_tests": 24,
+  "preview_tests": 11,
+  "compiler_xml_recorder_zip": "passed",
+  "fixes": [
+    "Catalog loading/empty/error distinction and retry guidance without losing last-good titles or local Continue Watching.",
+    "Subtitle metadata refresh refuses parent/other-episode fallback when the current episode is missing."
+  ],
+  "braces_status": "No published patched braces release; current brighterscript, fast-glob and micromatch versions retain affected chain. Exact installed paths and practical development-only exposure documented in tools/README.md. No audit suppression.",
+  "zip_sha256": "a57b29cd3d5c0411c43d51d6b498e2017e408340190cc51434b6e536e91c1f9a",
+  "native_device_tested": false,
+  "live_provider_tested": false,
+  "push_status": "Pending destination confirmation; no push",
+  "remaining_validation": [
+    "Native QR, focus, Persian navigation, captions, playback, registry upgrade/relaunch and real account switching.",
+    "Provider-supported on-device authentication/classification and representative versioned API/entitlement/progress fixtures.",
+    "True wire-byte response ceiling requires native transfer behavior validation; existing ceiling is before parsing only."
+  ],
+  "optional_deferred": [
+    "Detail cache: return from playback already reuses the title; no measured performance failure justifies adding another cache."
+  ]
+}

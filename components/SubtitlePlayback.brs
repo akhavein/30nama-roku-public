@@ -56,7 +56,11 @@ sub RefreshCaptionMetadata(result as Dynamic)
         if m.episode <> invalid then
             episodes = FlattenEpisodes(data.list)
             index = EpisodeIndex(episodes,m.episode.id)
-            if index >= 0 then subtitles = episodes[index].subtitle
+            if index < 0 then
+                m.captionNotice.text = "Subtitles for this episode are unavailable. Select the language again to retry."
+                return
+            end if
+            subtitles = episodes[index].subtitle
         end if
         m.subtitleOptions = SubtitleOptions(subtitles)
         LoadSidecarCaptions(m.captionCode,true)
