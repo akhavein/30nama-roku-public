@@ -4,13 +4,15 @@ Unofficial, native SceneGraph/BrightScript TV client for 30nama. Designed for re
 
 **Store-readiness development candidate · not submitted.** This is not an official Roku Store app or an affiliation with 30nama. It includes scene-preview work, but final candidate reinstall/resume acceptance is still pending. Publishing this source is not a v1.7 production release.
 
-## Store-readiness branch
+## Store candidate features
 
-This branch adds cold/warm deep links, Roku authentication reporting and launch beacons, short-lived account-bound helper sessions, account-switch/local-data clearing, original unofficial artwork, and initial system-caption/transport changes. It is **not native-verified or certified**. See [implementation status](docs/store/STATUS.md), [gateway setup](service/README.md), and [native acceptance matrix](docs/store/DEVICE_ACCEPTANCE.md).
+This source includes cold/warm deep links, Roku authentication reporting and launch beacons, short-lived account-bound helper sessions, account-switch/local-data clearing, original unofficial artwork, and initial system-caption/transport changes. These features are **not fully native-verified or certified**. See [implementation status](docs/store/STATUS.md), [gateway setup](service/README.md), and [native acceptance matrix](docs/store/DEVICE_ACCEPTANCE.md).
 
-## Easy Login feature branch
+## Phone sign-in for sideload use
 
-This branch adds **Account → Sign in with your phone**, with an on-TV QR/code, automatic account verification, bounded polling, expiry and cancellation. QR images are generated locally. It is intended for sideload testing; native TV acceptance is pending and this off-device flow is not represented as Store-approved. See [Easy Login and verification](docs/EASY_LOGIN.md).
+**Account → Sign in with your phone** displays an on-TV QR/code with automatic account verification, bounded polling, expiry and cancellation. QR images are generated locally. It is intended for sideload testing; native TV acceptance is pending and this off-device flow is not represented as Store-approved. See [Easy Login and verification](docs/EASY_LOGIN.md).
+
+The October reliability work adds bounded API scheduling, safer session/cache handling, explicit catalog error states and exact-episode subtitle refresh. See the [comparison and gap matrix](docs/ANDROID_COMPARISON.md), [remaining work](docs/GAP_BACKLOG.md), and [local verification](docs/VERIFICATION-2026-10-12-HOME-CAPTIONS.json). Local checks do not establish native acceptance or certification.
 
 ## Features
 

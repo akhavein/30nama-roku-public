@@ -144,4 +144,3 @@ function QrCode()
 
     return this
 end function
-

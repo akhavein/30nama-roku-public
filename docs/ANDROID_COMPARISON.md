@@ -4,6 +4,8 @@
 
 Work baseline: `akhavein/30nama-roku-public`, `feature/easy-login`, commit `ba8333faa60084509c60a33e9334cc7731982543`. Remote heads were checked on 2026-10-12 and match the clean existing checkout. Public main is `412879b0b2e24d5aa58a158f8bf9ab385aa6155d`; it does not include Easy Login. Local changes are isolated on `codex/android-auth-reliability`; nothing was pushed or published.
 
+This baseline and the verification files below record the pre-publication local work. The user subsequently approved these tested changes for public main on 2026-10-12. Source publication does not change any native-acceptance, deployment or certification status.
+
 The clean private checkout remains the household release source, with a separate preview candidate. Neither was edited; its private configuration and verification records are not part of this public source comparison. The public Easy Login line was selected because it contains the latest authentication and Store-candidate work, not because the private and public repositories are interchangeable. No ignored configuration, credentials, runtime captures or packages were copied from those checkouts.
 
 Reference: [mohaalak/30nama-androidtv at c7b248d](https://github.com/mohaalak/30nama-androidtv/tree/c7b248ddb114349919c6fc7eb014c7c8a590bf7b), the native Kotlin/Compose TV v2 app. Its [MIT license](https://github.com/mohaalak/30nama-androidtv/blob/c7b248ddb114349919c6fc7eb014c7c8a590bf7b/LICENSE) credits Rebin Sharifi and Hadi Aliakbar. The changes here are independent BrightScript implementations; no Android code, keys, fonts or assets were copied. Any later copying must retain the applicable notices and separately check asset/font licensing.
