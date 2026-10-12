@@ -274,17 +274,7 @@ sub OnApiResult(event as Object)
         if ok then m.helperStatus = "Ready"
         if task.httpStatus = 401 then m.helperStatus = "Pairing key needs repair"
     else if tag = "profile" then
-        if ok and IsMap(result.result) and SafeInt(result.result.userid) > 0 then
-            owner = Text(result.result.userid)
-            previousOwner = m.registry.Read("account_owner")
-            if previousOwner <> "" and previousOwner <> owner then ClearLocalViewingData()
-            m.registry.Write("account_owner",owner)
-            m.registry.Flush()
-            m.userId = SafeInt(result.result.userid)
-            m.syncToken = Text(result.result.usertoken)
-            ReportStoreAuthentication()
-            EnsureManagedSession()
-        end if
+        HandleProfile(result,task.httpStatus)
     else if tag = "remote-history" then
         HandleRemoteHistory(result)
     else if tag = "progress" then

@@ -1,7 +1,29 @@
 ' Service history integration. Local unsent progress wins over remote snapshots.
 sub LoadRemoteHistory()
     if m.api.token = "" then return
+    CancelRequest("remote-history")
     Request("profile","user",{})
+end sub
+
+' Resolve ownership before merging history; response order must not mix accounts.
+sub HandleProfile(result as Dynamic, httpStatus as Integer)
+    valid = false
+    if httpStatus >= 200 and httpStatus < 300 and IsMap(result) then
+        if Truth(result.success) and IsMap(result.result) then valid = SafeInt(result.result.userid) > 0
+    end if
+    if not valid then
+        m.syncStatus = "Account verification unavailable; local progress is safe"
+        return
+    end if
+    owner = Text(result.result.userid)
+    previousOwner = m.registry.Read("account_owner")
+    if previousOwner <> "" and previousOwner <> owner then ClearLocalViewingData()
+    m.registry.Write("account_owner",owner)
+    m.registry.Flush()
+    m.userId = SafeInt(result.result.userid)
+    m.syncToken = Text(result.result.usertoken)
+    ReportStoreAuthentication()
+    EnsureManagedSession()
     Request("remote-history","stream_watched/sortBy/1/sortBy/",{})
 end sub
 
